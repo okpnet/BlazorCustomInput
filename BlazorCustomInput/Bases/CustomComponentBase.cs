@@ -196,7 +196,7 @@ namespace BlazorCustomInput.Base
         {
             parameters.SetParameterProperties(this);
 
-            if (_initialize && EditContext == null)
+            if (!_initialize && EditContext == null)
             {
                 _initialize = true;
                 // This is the first run
