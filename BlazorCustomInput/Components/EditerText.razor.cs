@@ -27,7 +27,7 @@ namespace BlazorCustomInput.Components
         /// 型チェック｡GetStepAttrValがあれば評価いらない?
         /// </summary>
         /// <exception cref="InvalidOperationException"></exception>
-        public EditerText()
+        public EditerText():base()
         {
             var tvalType = Nullable.GetUnderlyingType(typeof(Tval)) ?? typeof(Tval);
             if (tvalType != typeof(string))
