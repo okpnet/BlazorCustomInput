@@ -14,4 +14,8 @@
     <PackageReference Include="MW.Blazor.Tree" Version="1.3.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\..\BlazorCustomInput\BlazorCustomInput.csproj" />
+  </ItemGroup>
+
 </Project>

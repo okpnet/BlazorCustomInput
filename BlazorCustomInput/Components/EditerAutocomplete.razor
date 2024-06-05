@@ -4,117 +4,111 @@
 
 <input @attributes="AdditionalAttributes"
        class="@CssClass"
-       @bind="Text"
-       @bind:event="oninput"
-       @onkeydown="OnKeyDown"
-       @onfocusout="OnLostFocus"
-       aria-autocomplete="list" aria-haspopup="true" autocomplete="off" role="combobox"
-       aria-expanded="true" />
-
+       value="@Text"
+       @oninput="OnInputAsync"
+       @onfocusout="OnLostFocusAsync"/>
+<br />
+@Text
+@if (autocomplete is not null && autocomplete.Any())
+{
+    @foreach (var item in autocomplete)
+    {
+        @AutocomleteNodes(item)
+    }
+}
 
 @code {
     [Parameter]
     public RenderFragment ChildContent { get; set; } = default!;
+    /// <summary>
+    /// オートコンプリートアイテムを表示するコンテンツ
+    /// </summary>
     [Parameter]
-    public RenderFragment LoadingTemplate { get; set; } = default!;
+    public RenderFragment<AutocompleteArg<TVal>> AutocomleteNodes { get; set; } = default!;
+    /// <summary>
+    /// オートコンプリートのリストを返す
+    /// </summary>
     [Parameter]
-    public Func<object,IEnumerable<TVal>> GetToken { get; set; }
+    public Func<string, IEnumerable<TVal>> GetAutocomleteItems { get; set; } = default!;
+    /// <summary>
+    /// オートコンプリートが検索開始する文字数
+    /// </summary>
     [Parameter]
     public int MinTextLength { get; set; } = 2;
-    private string text = "";
-    private List<AutocompleteItem>? autocomplete { get; set; }
-    private string Text
+    /// <summary>
+    /// TValから文字列を取り出し/生成
+    /// </summary>
+    [Parameter]
+    public Func<TVal, string> GetText { get; set; } = (x)=>x is string val?val:x?.ToString()??string.Empty;
+    /// <summary>
+    /// インプットボックスにキーボード入力
+    /// </summary>
+    [Parameter]
+    public EventCallback<KeyboardEventArgs> KeyEventCallback{ get; set; }
+    /// <summary>
+    /// コンプリート完了したときに呼び出しされる｡
+    /// </summary>
+    [Parameter]
+    public EventCallback<string?> CompleteCallBack { get; set; } = default!;
+    /// <summary>
+    /// オートコンプリートリスト
+    /// </summary>
+    List<AutocompleteArg<TVal>>? autocomplete { get; set; }
+    /// <summary>
+    /// インプットボックスに
+    /// </summary>
+    private string? Text { get; set; } = string.Empty;
+    /// <summary>
+    /// 確定
+    /// </summary>
+    async Task OnLostFocusAsync()
     {
-        get => text;
-        set
+        autocomplete = default;
+        if (CompleteCallBack.HasDelegate)
         {
-            text = value;
-            CurrentValueAsString = value;
-            SetAutocomplete();
+            await CompleteCallBack.InvokeAsync(Text);
         }
     }
-    private void OnKeyDown(KeyboardEventArgs e)
+    /// <summary>
+    /// リストの呼び出し
+    /// </summary>
+    async Task OnInputAsync(ChangeEventArgs e)
     {
-        if (e.Key == "ArrowDown")
+        Text = e.Value as string;
+        if (Text?.Length > MinTextLength && GetAutocomleteItems is not null)
         {
-            SelectNextItem();
+            autocomplete = new();
+            autocomplete.Add(new AutocompleteArg<TVal> { IsLoading = true });
+            await Task.Run(() =>
+            {
+                autocomplete.Clear();
+                autocomplete = GetAutocomleteItems(Text).
+                    Select(t=>new AutocompleteArg<TVal>(){Value=t,IsLoading=false,SelectCallback=EventCallback.Factory.Create<TVal>(this,OnSelectItem)}).
+                    ToList();
+            });
         }
-        else if (e.Key == "ArrowUp")
-        {
-            SelectPreviousItem();
-        }
-        else if (e.Key == "Enter" && autocomplete?.Any(d => d.IsSelected) == true)
-        {
-            AutocompleteItemClick(autocomplete.First(d => d.IsSelected).Text);
-        }
-        else if (e.Key == "Escape")
+        else
         {
             autocomplete = default;
         }
     }
-
-    private void OnLostFocus() => autocomplete = default;
-    private void SetAutocomplete()
+    /// <summary>
+    /// 選択されたときに呼び出される
+    /// </summary>
+    /// <param name="value"></param>
+    void OnSelectItem(TVal value)
     {
-        autocomplete = text?.Length > MinTextLength
-        ? Source.Where(d => d.Contains(text, StringComparison.InvariantCultureIgnoreCase))
-                .Select(d => new AutocompleteItem { Text = d })
-                .ToList()
-        : default;
+        Text = GetText(value);
     }
-
-    private void AutocompleteItemClick(string item)
-    {
-        Text = item;
-        autocomplete = default;
-    }
-    private void AutocompleteMouseOver(string item) => autocomplete?.ForEach(d => d.IsSelected = false);
-    private void SelectNextItem()
-    {
-        if (autocomplete?.Any() == true)
-        {
-            var prevItem = autocomplete.FirstOrDefault(d => d.IsSelected);
-            if (prevItem is null)
-            {
-                autocomplete.First().IsSelected = true;
-            }
-            else
-            {
-                var index = autocomplete.IndexOf(prevItem);
-                if (index < autocomplete.Count - 1)
-                {
-                    prevItem.IsSelected = false;
-                    autocomplete.ElementAt(index + 1).IsSelected = true;
-                }
-            }
-        }
-    }
-    private void SelectPreviousItem()
-    {
-        if (autocomplete?.Any() == true)
-        {
-            var currentItem = autocomplete.FirstOrDefault(d => d.IsSelected);
-            if (currentItem is null)
-            {
-                autocomplete.Last().IsSelected = true;
-            }
-            else
-            {
-                var index = autocomplete.IndexOf(currentItem);
-                if (index > 0)
-                {
-                    currentItem.IsSelected = false;
-                    autocomplete.ElementAt(index - 1).IsSelected = true;
-                }
-            }
-        }
-    }
+    /// <summary>
+    /// オーバーライド
+    /// </summary>
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
         if (string.IsNullOrEmpty(Text) && base.Value is not null)
         {
-            Text = Value;
+            Text =GetText(Value);
         }
     }
 }

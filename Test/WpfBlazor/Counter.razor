@@ -1,9 +1,45 @@
 ﻿@using WpfBlazor
 @using MW.Blazor
+@using BlazorCustomInput.Components
 <h1>Counter</h1>
 
-
+<EditerAutocomplete CompleteCallBack="OnComplete" GetAutocomleteItems="OnSearch" @bind-Value="Model.Name">
+    <AutocomleteNodes>
+        @if (context.IsLoading)
+        {
+        <p>loading</p>
+        }
+        else
+        {
+        <p>@context.Value</p>
+        }
+    </AutocomleteNodes>
+</EditerAutocomplete>
 
 @code {
+    public BindModel Model{ get; set; }
 
+    List<BindModel> tests = new()
+    {
+        new BindModel{Name="小田原5",Id=1},
+        new BindModel{Name="ハチ公前5",Id=2},
+        new BindModel{Name="日5",Id=3},
+        new BindModel{Name="アメリカ5",Id=4},
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        Model = new();
+        await base.OnInitializedAsync();
+    }
+
+    IEnumerable<string> OnSearch(string value)
+    {
+        return tests.Where(t => t.Name.Contains(value)).Select(t => t.Name);
+    }
+
+    void OnComplete()
+    {
+        System.Diagnostics.Debug.Assert(true);
+    }
 }
