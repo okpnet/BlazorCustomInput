@@ -4,19 +4,20 @@
 
 <input @attributes="AdditionalAttributes"
        class="@CssClass"
-       @bind="Value"
+       @bind="@Value"
        @bind:event="oninput"
        @bind:after="OnInputAsync"
-       @onfocusout="OnLostFocusAsync"/>
+       @onblur="OnLostFocus" />
 <br />
-@(GetText(Value))
-@if (autocomplete is not null && autocomplete.Any())
-{
-    @foreach (var item in autocomplete)
+<span @onmouseover="(()=>isOut=false)" @onmouseleave="(()=>isOut=true)" >
+    @if (autocomplete is not null && autocomplete.Any())
     {
-        @AutocomleteNodes(item)
+        @foreach (var item in autocomplete)
+        {
+            @AutocomleteNodes(item)
+        }
     }
-}
+</span>
 
 @code {
     [Parameter]
@@ -30,12 +31,12 @@
     /// オートコンプリートのリストを返す
     /// </summary>
     [Parameter]
-    public Func<TVal?, IEnumerable<TVal>> GetAutocomleteItems { get; set; } = default!;
+    public Func<TVal?, Task<IEnumerable<TVal>>> GetAutocomleteItems { get; set; } = default!;
     /// <summary>
     /// オートコンプリートが検索開始する文字数
     /// </summary>
     [Parameter]
-    public int MinTextLength { get; set; } = 2;
+    public int MinTextLength { get; set; } = 3;
     /// <summary>
     /// TValから文字列を取り出し/生成
     /// </summary>
@@ -51,21 +52,22 @@
     /// </summary>
     [Parameter]
     public EventCallback CompleteCallBack { get; set; } = default!;
+
     /// <summary>
     /// オートコンプリートリスト
     /// </summary>
     List<AutocompleteArg<TVal>>? autocomplete { get; set; }
 
-    private string test{ get; set; }
+    bool isOut = true;
     /// <summary>
     /// 確定
     /// </summary>
-    async Task OnLostFocusAsync()
+    void OnLostFocus()
     {
-        autocomplete = default;
-        if (CompleteCallBack.HasDelegate)
+        if (isOut)
         {
-            await CompleteCallBack.InvokeAsync(Value);
+            autocomplete = default;
+            return;
         }
     }
     /// <summary>
@@ -73,17 +75,13 @@
     /// </summary>
     async Task OnInputAsync()
     {
-        if (GetText(Value).Length > MinTextLength && GetAutocomleteItems is not null)
+        if (GetText(Value).Length >= MinTextLength && GetAutocomleteItems is not null)
         {
             autocomplete = new();
-            autocomplete.Add(new AutocompleteArg<TVal> { IsLoading = true });
-            await Task.Run(() =>
-            {
-                autocomplete.Clear();
-                autocomplete = GetAutocomleteItems(Value).
-                    Select(t=>new AutocompleteArg<TVal>(){Value=t,IsLoading=false,SelectCallback=EventCallback.Factory.Create<TVal>(this,OnSelectItem)}).
-                    ToList();
-            });
+            autocomplete.Add(new AutocompleteArg<TVal>());
+            var autocompleteItems = await GetAutocomleteItems(Value);
+            autocomplete = new();
+            autocomplete = autocompleteItems.Select(t => new AutocompleteArg<TVal>(t, false, EventCallback.Factory.Create<TVal>(this, OnSelectItem))).ToList();
         }
         else
         {
@@ -94,5 +92,11 @@
     /// 選択されたときに呼び出される
     /// </summary>
     /// <param name="value"></param>
-    void OnSelectItem(TVal value)=>Value=value;
+    void OnSelectItem(TVal value)
+    {
+        autocomplete = default;
+        Value = value;
+    }
+
+
 }

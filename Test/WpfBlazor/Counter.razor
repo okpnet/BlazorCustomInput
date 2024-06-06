@@ -11,19 +11,19 @@
         }
         else
         {
-        <p>@context.Value</p>
+        <a @onclick="context.Selected">@context.Value</a>
         }
     </AutocomleteNodes>
 </EditerAutocomplete>
 
 @code {
-    public BindModel Model{ get; set; }
+    public BindModel Model { get; set; } = new();
 
     List<BindModel> tests = new()
     {
         new BindModel{Name="小田原5",Id=1},
         new BindModel{Name="ハチ公前5",Id=2},
-        new BindModel{Name="日5",Id=3},
+        new BindModel{Name="日本",Id=3},
         new BindModel{Name="アメリカ5",Id=4},
     };
 
@@ -33,8 +33,9 @@
         await base.OnInitializedAsync();
     }
 
-    IEnumerable<string> OnSearch(string value)
+    async Task<IEnumerable<string>> OnSearch(string value)
     {
+        await Task.Delay(2000);
         return tests.Where(t => t.Name.Contains(value)).Select(t => t.Name);
     }
 
