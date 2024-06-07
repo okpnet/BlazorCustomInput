@@ -20,26 +20,35 @@ namespace BlazorCustomInput.Components
             @bind:event="oninput"
             @bind:after="OnInputAsync"
             @onblur="OnLostFocus" />
-    <br />
-    <span @onmouseover="(()=>isOut=false)" @onmouseleave="(()=>isOut=true)" >
-        @if (autocomplete is not null && autocomplete.Any())
-        {
-            @foreach (var item in autocomplete)
-            {
-                @AutocomleteNodes(item)
-            }
-        }
-    </span>
-     * */
+    
+    @if (autocomplete is not null && autocomplete.Any())
+    {
+        <br />
+        <span @onmouseover="(()=>isOut=false)" @onmouseleave="(()=>isOut=true)" >
+            <Cascad value="IsLoading">
+                <Cascad value="autocomplete">
+                    <AutocompelteFrame/>
+                </cascade>
+            </cascade>
+        </span>
+    }
+    */
     public partial class EditerAutocomplete<TVal>:EditerText<TVal>
     {
         [Parameter]
         public RenderFragment ChildContent { get; set; } = default!;
         /// <summary>
-        /// オートコンプリートアイテムを表示するコンテンツ
+        /// 
         /// </summary>
         [Parameter]
-        public RenderFragment<AutocompleteArg<TVal>> AutocomleteNodes { get; set; } = default!;
+        public RenderFragment<AutocompleteFrame<TVal>> Frame { get; set; } = default!;
+        [Parameter]
+        public RenderFragment<RenderFragment<AutocompleteFrame<TVal>>> test { get; set; } = default!;
+        /// <summary>
+        /// 読み込み中
+        /// </summary>
+        [Parameter]
+        public RenderFragment? LoadingTemplate { get; set; } = default!;
         /// <summary>
         /// オートコンプリートのリストを返す
         /// </summary>
@@ -70,7 +79,14 @@ namespace BlazorCustomInput.Components
         /// オートコンプリートリスト
         /// </summary>
         List<AutocompleteArg<TVal>>? autocomplete { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
         bool isOut = true;
+        /// <summary>
+        /// 
+        /// </summary>
+        bool isLoading = true;
 
         protected override void BuildRenderTree(RenderTreeBuilder builder)
         {
@@ -108,18 +124,31 @@ namespace BlazorCustomInput.Components
                     Value));
             builder.SetUpdatesAttributeName("value");
             builder.CloseElement();
-            builder.AddMarkupContent(++index, "\r\n<br>\r\n");
-            builder.OpenElement(++index, "span");
-            builder.AddAttribute(++index, "onmouseover", EventCallback.Factory.Create<MouseEventArgs>(this,(() => isOut = false)));
-            builder.AddAttribute(++index, "onmouseleave", EventCallback.Factory.Create<MouseEventArgs>(this,(() => isOut = true)));
+            if (isLoading)
+            {
+                builder.AddContent(++index, LoadingTemplate);
+                return;
+            }
             if (autocomplete is not null && autocomplete.Any())
             {
-                foreach (var item in autocomplete)
+                builder.AddMarkupContent(++index, "\r\n<br>\r\n");
+                builder.OpenElement(++index, "span");
+                builder.AddAttribute(++index, "onmouseover", EventCallback.Factory.Create<MouseEventArgs>(this, (() => isOut = false)));
+                builder.AddAttribute(++index, "onmouseleave", EventCallback.Factory.Create<MouseEventArgs>(this, (() => isOut = true)));
+                builder.OpenComponent<CascadingValue<bool>>(++index);
+                builder.AddAttribute(++index, "Value", isLoading);
+                builder.AddAttribute(++index, "Name", "IsLoading");
+                builder.OpenComponent<CascadingValue<IEnumerable<AutocompleteArg<TVal>>>>(++index);
+                builder.AddAttribute(++index, "Value", autocomplete);
+                builder.AddAttribute(++index, "Name", "AutocompleteItems");
+                builder.AddAttribute(++index, nameof(Frame), (RenderFragment)((builder2) =>
                 {
-                    builder.AddContent(++index,AutocomleteNodes(item));
-                }
+                }));
+                builder.CloseComponent();
+                builder.CloseComponent();
+                builder.CloseComponent();
+                builder.CloseElement();
             }
-            builder.CloseElement();
         }
         /// <summary>
         /// 確定
@@ -137,17 +166,24 @@ namespace BlazorCustomInput.Components
         /// </summary>
         async Task OnInputAsync()
         {
-            if (GetText(Value).Length >= MinTextLength && GetAutocomleteItems is not null)
+            try
             {
-                autocomplete = new();
-                autocomplete.Add(new AutocompleteArg<TVal>());
-                var autocompleteItems = await GetAutocomleteItems(Value);
-                autocomplete = new();
-                autocomplete = autocompleteItems.Select(t => new AutocompleteArg<TVal>(t, false, EventCallback.Factory.Create<TVal>(this, OnSelectItem))).ToList();
+                if (GetText(Value).Length >= MinTextLength && GetAutocomleteItems is not null)
+                {
+                    isLoading = true;
+                    autocomplete = new();
+                    var autocompleteItems = await GetAutocomleteItems(Value);
+                    autocomplete = new();
+                    autocomplete = autocompleteItems.Select(t => new AutocompleteArg<TVal>(t, false, EventCallback.Factory.Create<TVal>(this, OnSelectItem))).ToList();
+                }
+                else
+                {
+                    autocomplete = default;
+                }
             }
-            else
+            finally
             {
-                autocomplete = default;
+                isLoading = false;
             }
         }
         /// <summary>

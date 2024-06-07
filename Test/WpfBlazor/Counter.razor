@@ -3,17 +3,14 @@
 @using BlazorCustomInput.Components
 <h1>Counter</h1>
 
+
+
 <EditerAutocomplete CompleteCallBack="OnComplete" GetAutocomleteItems="OnSearch" @bind-Value="Model.Name">
-    <AutocomleteNodes>
-        @if (context.IsLoading)
-        {
-        <p>loading</p>
-        }
-        else
-        {
-        <a @onclick="context.Selected">@context.Value</a>
-        }
-    </AutocomleteNodes>
+    <Frame>
+        <spna>
+            <template></template>
+        </spna>
+    </Frame>
 </EditerAutocomplete>
 
 @code {
