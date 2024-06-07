@@ -43,7 +43,7 @@ namespace BlazorCustomInput.Components
         [Parameter]
         public RenderFragment<AutocompleteFrame<TVal>> Frame { get; set; } = default!;
         [Parameter]
-        public RenderFragment<RenderFragment<AutocompleteFrame<TVal>>> test { get; set; } = default!;
+        public RenderFragment<IEnumerable<AutocompleteFrame<TVal>>> test { get; set; } = default!;
         /// <summary>
         /// 読み込み中
         /// </summary>
