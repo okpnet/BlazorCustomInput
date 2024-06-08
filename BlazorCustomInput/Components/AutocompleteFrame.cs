@@ -1,14 +1,8 @@
 ﻿using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Rendering;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlazorCustomInput.Components
 {
-    public class AutocompleteFrame<TVal>:ComponentBase
+    public class AutocompleteFrame<TVal> : ComponentBase
     {
         [CascadingParameter]
         public bool IsLoading { get; set; }
@@ -24,13 +18,13 @@ namespace BlazorCustomInput.Components
         public RenderFragment<AutocompleteArg<TVal>> Template { get; set; } = default!;
 
 
-        protected override void BuildRenderTree(RenderTreeBuilder builder)
-        {
-            int index = 0;
-            foreach(var item in AutocompleteItems)
-            {
-                builder.AddContent(++index, AutocomleteNodes(item));
-            }
-        }
+        //protected override void BuildRenderTree(RenderTreeBuilder builder)
+        //{
+        //    int index = 0;
+        //    foreach(var item in AutocompleteItems)
+        //    {
+        //        builder.AddContent(++index, AutocomleteNodes(item));
+        //    }
+        //}
     }
 }

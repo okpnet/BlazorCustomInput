@@ -10,7 +10,7 @@ namespace BlazorCustomInput.Base
     /// A clone of the InputBase class. However, a null value for the parameter "EditContext" is allowed.
     /// </summary>
     /// <typeparam name="TValue"></typeparam>
-    public abstract class CustomComponentBase<TValue> : ComponentBase,IDisposable
+    public abstract class CustomComponentBase<TValue> : ComponentBase, IDisposable
     {
         private bool _initialize = false;//初回の初期化後True
         private readonly EventHandler<ValidationStateChangedEventArgs> _validationStateChangedHandler;
@@ -24,7 +24,7 @@ namespace BlazorCustomInput.Base
         /// <summary>
         /// Gets or sets a collection of additional attributes that will be applied to the created element.
         /// </summary>
-        [Parameter(CaptureUnmatchedValues = true)] 
+        [Parameter(CaptureUnmatchedValues = true)]
         public IReadOnlyDictionary<string, object>? AdditionalAttributes { get; set; }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace BlazorCustomInput.Base
         /// Gets or sets the display name for this field.
         /// <para>This value is used when generating error messages when the input value fails to parse correctly.</para>
         /// </summary>
-        [Parameter] 
+        [Parameter]
         public string? DisplayName { get; set; }
 
         /// <summary>
@@ -162,7 +162,7 @@ namespace BlazorCustomInput.Base
         /// some combination of "modified", "valid", or "invalid", depending on the status of the field.
         /// </summary>
         private string FieldClass
-            => EditContext is not null? EditContext.FieldCssClass(FieldIdentifier):"";
+            => EditContext is not null ? EditContext.FieldCssClass(FieldIdentifier) : "";
 
         /// <summary>
         /// Gets a CSS class string that combines the <c>class</c> attribute and <see cref="FieldClass"/>
@@ -218,7 +218,7 @@ namespace BlazorCustomInput.Base
                 EditContext = CascadedEditContext;
                 FieldIdentifier = FieldIdentifier.Create(ValueExpression);
                 _nullableUnderlyingType = Nullable.GetUnderlyingType(typeof(TValue));
-                if(EditContext is not null)
+                if (EditContext is not null)
                 {
                     EditContext.OnValidationStateChanged += _validationStateChangedHandler;
                 }

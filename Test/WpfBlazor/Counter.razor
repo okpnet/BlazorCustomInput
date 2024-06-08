@@ -5,17 +5,14 @@
 
 
 
-<EditerAutocomplete CompleteCallBack="OnComplete" GetAutocomleteItems="OnSearch" @bind-Value="Model.Name">
-    <test>
+<TestAutocomplete CompleteCallBack="OnComplete" GetAutocomleteItems="OnSearch" @bind-Value="Model.Name">
+    <AutocompleteFrame TVal="string">
+        
         <span>
-            <AutocompleteFrame Context="name">
-                <Template>
-
-                </Template>
-            </AutocompleteFrame>
+            <TestAutocompleteNode></TestAutocompleteNode>
         </span>
-    </test>
-</EditerAutocomplete>
+    </AutocompleteFrame>
+</TestAutocomplete>
 
 @code {
     public BindModel Model { get; set; } = new();

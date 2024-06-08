@@ -1,11 +1,6 @@
-﻿using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.Components;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
+using Microsoft.AspNetCore.Components.Web;
 
 namespace BlazorCustomInput.Components
 {
@@ -33,7 +28,7 @@ namespace BlazorCustomInput.Components
         </span>
     }
     */
-    public partial class EditerAutocomplete<TVal>:EditerText<TVal>
+    public partial class EditerAutocomplete<TVal> : EditerText<TVal>
     {
         [Parameter]
         public RenderFragment ChildContent { get; set; } = default!;
@@ -107,7 +102,7 @@ namespace BlazorCustomInput.Components
             builder.AddMultipleAttributes(++index, AdditionalAttributes);
             builder.AddAttribute(++index, "type", editType);
             builder.AddAttribute(++index, "class", CssClass);
-            builder.AddAttribute(++index, "onblur", EventCallback.Factory.Create<global::Microsoft.AspNetCore.Components.Web.FocusEventArgs>(this,OnLostFocus));
+            builder.AddAttribute(++index, "onblur", EventCallback.Factory.Create<global::Microsoft.AspNetCore.Components.Web.FocusEventArgs>(this, OnLostFocus));
             builder.AddAttribute(++index, "value", BindConverter.FormatValue(CurrentValueAsString));
             builder.AddAttribute(
                 ++index,
@@ -115,11 +110,11 @@ namespace BlazorCustomInput.Components
                 EventCallback.Factory.CreateBinder(
                     this,
                     Microsoft.AspNetCore.Components.CompilerServices.RuntimeHelpers.CreateInferredBindSetter(
-                        callback: __value => 
+                        callback: __value =>
                         {
                             Value = __value;
-                            return Microsoft.AspNetCore.Components.CompilerServices.RuntimeHelpers.InvokeAsynchronousDelegate(callback:OnInputAsync);
-                        }, 
+                            return Microsoft.AspNetCore.Components.CompilerServices.RuntimeHelpers.InvokeAsynchronousDelegate(callback: OnInputAsync);
+                        },
                         value: Value),
                     Value));
             builder.SetUpdatesAttributeName("value");

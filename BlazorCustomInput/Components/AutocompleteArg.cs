@@ -1,9 +1,4 @@
 ﻿using Microsoft.AspNetCore.Components;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlazorCustomInput.Components
 {
@@ -28,13 +23,13 @@ namespace BlazorCustomInput.Components
 
         public AutocompleteArg()
         {
-            IsLoading= true;
-            Value= default;
+            IsLoading = true;
+            Value = default;
             SelectCallback = EventCallback<Tval>.Empty;
             Selected = EventCallback.Factory.Create(this, OnSelected);
         }
 
-        public AutocompleteArg(Tval? value, bool isLoading, EventCallback<Tval> selectCallback):this()
+        public AutocompleteArg(Tval? value, bool isLoading, EventCallback<Tval> selectCallback) : this()
         {
             Value = value;
             IsLoading = isLoading;
@@ -45,7 +40,7 @@ namespace BlazorCustomInput.Components
         /// </summary>
         void OnSelected()
         {
-            if(!IsLoading && SelectCallback.HasDelegate)
+            if (!IsLoading && SelectCallback.HasDelegate)
             {
                 SelectCallback.InvokeAsync(Value);
             }

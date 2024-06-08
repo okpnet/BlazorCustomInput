@@ -1,0 +1,120 @@
+﻿@using Microsoft.AspNetCore.Components.Web
+@typeparam TVal
+@inherits EditerText<TVal>
+<input @attributes="AdditionalAttributes"
+       class="@CssClass"
+       @bind="@Value"
+       @bind:event="oninput"
+       @bind:after="OnInputAsync"
+       @onblur="OnLostFocus" />
+           
+@if (autocomplete is not null && autocomplete.Any())
+{
+    <br />
+    <span @onmouseover="(()=>isOut=false)" @onmouseleave="(()=>isOut=true)" >
+        <CascadingValue Value="this">
+            @test(autocomplete)
+        </CascadingValue>
+    </span>
+}
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; } = default!;
+    /// <summary>
+    ///
+    /// </summary>
+    [Parameter]
+    public RenderFragment<AutocompleteArg<TVal>> Nodes { get; set; } = default!;
+
+    [Parameter]
+    public RenderFragment<IEnumerable<AutocompleteArg<TVal>>> test { get; set; } = default!;
+    /// <summary>
+    /// 読み込み中
+    /// </summary>
+    [Parameter]
+    public RenderFragment? LoadingTemplate { get; set; } = default!;
+    /// <summary>
+    /// オートコンプリートのリストを返す
+    /// </summary>
+    [Parameter]
+    public Func<TVal?, Task<IEnumerable<TVal>>> GetAutocomleteItems { get; set; } = default!;
+    /// <summary>
+    /// オートコンプリートが検索開始する文字数
+    /// </summary>
+    [Parameter]
+    public int MinTextLength { get; set; } = 3;
+    /// <summary>
+    /// TValから文字列を取り出し/生成
+    /// </summary>
+    [Parameter]
+    public Func<TVal?, string> GetText { get; set; } = (x) => x is string val ? val : x?.ToString() ?? string.Empty;
+    /// <summary>
+    /// インプットボックスにキーボード入力
+    /// </summary>
+    [Parameter]
+    public EventCallback<KeyboardEventArgs> KeyEventCallback { get; set; }
+    /// <summary>
+    /// コンプリート完了したときに呼び出しされる｡
+    /// </summary>
+    [Parameter]
+    public EventCallback CompleteCallBack { get; set; } = default!;
+
+    /// <summary>
+    /// オートコンプリートリスト
+    /// </summary>
+    List<AutocompleteArg<TVal>>? autocomplete { get; set; }
+    /// <summary>
+    ///
+    /// </summary>
+    bool isOut = true;
+    /// <summary>
+    ///
+    /// </summary>
+    bool isLoading = true;
+    /// <summary>
+    /// 確定
+    /// </summary>
+    void OnLostFocus()
+    {
+        if (isOut)
+        {
+            autocomplete = default;
+            return;
+        }
+    }
+    /// <summary>
+    /// リストの呼び出し
+    /// </summary>
+    async Task OnInputAsync()
+    {
+        try
+        {
+            if (GetText(Value).Length >= MinTextLength && GetAutocomleteItems is not null)
+            {
+                isLoading = true;
+                autocomplete = new();
+                var autocompleteItems = await GetAutocomleteItems(Value);
+                autocomplete = new();
+                autocomplete = autocompleteItems.Select(t => new AutocompleteArg<TVal>(t, false, EventCallback.Factory.Create<TVal>(this, OnSelectItem))).ToList();
+            }
+            else
+            {
+                autocomplete = default;
+            }
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+    /// <summary>
+    /// 選択されたときに呼び出される
+    /// </summary>
+    /// <param name="value"></param>
+    void OnSelectItem(TVal value)
+    {
+        autocomplete = default;
+        Value = value;
+    }
+}
