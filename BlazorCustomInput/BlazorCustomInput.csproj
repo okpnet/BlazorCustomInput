@@ -16,10 +16,6 @@
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 	</PropertyGroup>-->
 
-	<ItemGroup>
-	  <Content Remove="Components\TestAutocomplete.razor" />
-	</ItemGroup>
-
   <ItemGroup>
     <SupportedPlatform Include="browser" />
   </ItemGroup>
@@ -30,18 +26,6 @@
 
   <ItemGroup>
     <Folder Include="wwwroot\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <_ContentIncludedByDefault Remove="Components\TestAutocomplete.razor" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Components\TestAutocomplete.razor" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <UpToDateCheckInput Remove="Components\TestAutocomplete.razor" />
   </ItemGroup>
 
 </Project>

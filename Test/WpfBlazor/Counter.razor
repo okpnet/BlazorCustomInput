@@ -5,22 +5,27 @@
 
 
 
-<TestAutocomplete CompleteCallBack="OnComplete" GetAutocomleteItems="OnSearch" @bind-Value="Model.Name">
-    <AutocompleteFrame TVal="string">
-        
-        <span>
-            <TestAutocompleteNode></TestAutocompleteNode>
-        </span>
-    </AutocompleteFrame>
-</TestAutocomplete>
+<TestEditAutcomplete CompleteCallBack="OnComplete" GetAutocomleteItems="OnSearch" @bind-Value="Model.Name">
+    <LoadingTemplate>
+        <span>Loading</span>
+    </LoadingTemplate>
+    <test>
+        <div style="background-color:aqua">
+            @foreach(var node in context)
+            {
+                <p>@node.Value</p>
+            }
+        </div>
+    </test>
+</TestEditAutcomplete>
 
 @code {
     public BindModel Model { get; set; } = new();
 
     List<BindModel> tests = new()
     {
-        new BindModel{Name="小田原5",Id=1},
-        new BindModel{Name="ハチ公前5",Id=2},
+        new BindModel{Name="アメリ小田原5",Id=1},
+        new BindModel{Name="ハチ公アメリ前5",Id=2},
         new BindModel{Name="日本",Id=3},
         new BindModel{Name="アメリカ5",Id=4},
     };

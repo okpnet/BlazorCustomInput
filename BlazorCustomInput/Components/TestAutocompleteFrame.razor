@@ -1,0 +1,13 @@
+﻿@typeparam TVal
+
+@code {
+    [CascadingParameter]
+    public TestEditAutcomplete<TVal> Parent{ get; set; }
+    [Parameter]
+    public RenderFragment<AutocompleteArg<TVal>> AutocompleteNode { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+    }
+}
