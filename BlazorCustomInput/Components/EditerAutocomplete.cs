@@ -100,19 +100,18 @@ else if (autocomplete is not null)
                 "oninput",
                 EventCallback.Factory.CreateBinder(
                     this,
-                    Microsoft.AspNetCore.Components.CompilerServices.RuntimeHelpers.CreateInferredBindSetter(
+                    RuntimeHelpers.CreateInferredBindSetter(
                         callback: __value =>
                         {
                             Value = __value;
-                            System.Diagnostics.Debug.WriteLine("input");
-                            return Microsoft.AspNetCore.Components.CompilerServices.RuntimeHelpers.InvokeAsynchronousDelegate(callback: OnInputAsync);
+                            return RuntimeHelpers.InvokeAsynchronousDelegate(callback: OnInputAsync);
                         },
                         value: Value),
                     Value)
             );
 
             builder.SetUpdatesAttributeName("value");
-            //builder.AddElementReferenceCapture(++index, __inputReference => Element = __inputReference);
+            builder.AddElementReferenceCapture(++index, __inputReference => Element = __inputReference);
             builder.CloseElement();
 
             if (IsLoading && LoadingTemplate is not null)
@@ -133,7 +132,7 @@ else if (autocomplete is not null)
         /// </summary>
         async Task OnFocusoutAsync()
         {
-            System.Diagnostics.Debug.WriteLine("focusout");
+            //System.Diagnostics.Debug.WriteLine("focusout");
             await Task.Delay(500);
             System.Diagnostics.Debug.WriteLine(Value);
             if (CompleteCallBack.HasDelegate) await CompleteCallBack.InvokeAsync();
@@ -152,7 +151,7 @@ else if (autocomplete is not null)
                     IsLoading = true;
                     autocomplete = new();
                     var autocompleteItems = await GetAutocomleteItems(Value);
-                    autocomplete = autocompleteItems.Select(t => new AutocompleteArg<TVal>(t, false, EventCallback.Factory.Create<TVal>(this, OnSelectItemAsync))).ToList();
+                    autocomplete = autocompleteItems.Select(t => new AutocompleteArg<TVal>(t, EventCallback.Factory.Create<TVal>(this, OnSelectItemAsync))).ToList();
                 }
                 else
                 {
@@ -170,7 +169,7 @@ else if (autocomplete is not null)
         /// <param name="value"></param>
         async Task OnSelectItemAsync(TVal value)
         {
-            System.Diagnostics.Debug.WriteLine("selected");
+            //System.Diagnostics.Debug.WriteLine("selected");
             Value = value;
             autocomplete = default;
             await ValueChanged.InvokeAsync(Value);
