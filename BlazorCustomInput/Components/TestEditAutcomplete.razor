@@ -4,37 +4,24 @@
 
 <input @attributes="AdditionalAttributes"
        class="@CssClass"
-       @bind="@Value"
+       @bind="Value"
        @bind:event="oninput"
        @bind:after="OnInputAsync"
-       @onblur="OnLostFocus" />
-@if (IsLoading)
+       @onfocusout="OnFocusoutAsync" />
+    @if (IsLoading)
 {
     <br />
     @LoadingTemplate
 }
-else if (autocomplete is not null && autocomplete.Any())
+else if (autocomplete is not null)
 {
     <br />
-    <span @onmouseover="(()=>isOut=false)" @onmouseleave="(()=>isOut=true)">
-        <CascadingValue Value="this" Name="Parent">
-            @test(autocomplete)
-        </CascadingValue>
-    </span>
+    @AutocompleteFrame(autocomplete)
 }
-
 
 @code {
     [Parameter]
-    public RenderFragment ChildContent { get; set; } = default!;
-    /// <summary>
-    ///
-    /// </summary>
-    [Parameter]
-    public RenderFragment<AutocompleteArg<TVal>> Nodes { get; set; } = default!;
-
-    [Parameter]
-    public RenderFragment<IEnumerable<AutocompleteArg<TVal>>> test { get; set; } = default!;
+    public RenderFragment<IEnumerable<AutocompleteArg<TVal>>> AutocompleteFrame { get; set; } = default!;
     /// <summary>
     /// 読み込み中
     /// </summary>
@@ -71,29 +58,26 @@ else if (autocomplete is not null && autocomplete.Any())
     /// </summary>
     List<AutocompleteArg<TVal>>? autocomplete { get; set; }
     /// <summary>
-    ///
-    /// </summary>
-    bool isOut = true;
-    /// <summary>
-    ///
+    ///読み込み中
     /// </summary>
     bool IsLoading { get; set; } = false;
     /// <summary>
     /// 確定
     /// </summary>
-    void OnLostFocus()
+    async Task OnFocusoutAsync()
     {
-        if (isOut)
-        {
-            autocomplete = default;
-            return;
-        }
+        System.Diagnostics.Debug.WriteLine("focusout");
+        await Task.Delay(500);
+        System.Diagnostics.Debug.WriteLine(Value);
+        if (CompleteCallBack.HasDelegate)await CompleteCallBack.InvokeAsync();
+        autocomplete = default;
     }
     /// <summary>
     /// リストの呼び出し
     /// </summary>
     async Task OnInputAsync()
     {
+        await ValueChanged.InvokeAsync(Value);
         try
         {
             if (GetText(Value).Length >= MinTextLength && GetAutocomleteItems is not null)
@@ -101,8 +85,7 @@ else if (autocomplete is not null && autocomplete.Any())
                 IsLoading = true;
                 autocomplete = new();
                 var autocompleteItems = await GetAutocomleteItems(Value);
-                autocomplete = new();
-                autocomplete = autocompleteItems.Select(t => new AutocompleteArg<TVal>(t, false, EventCallback.Factory.Create<TVal>(this, OnSelectItem))).ToList();
+                autocomplete = autocompleteItems.Select(t => new AutocompleteArg<TVal>(t, false, EventCallback.Factory.Create<TVal>(this, OnSelectItemAsync))).ToList();
             }
             else
             {
@@ -118,9 +101,11 @@ else if (autocomplete is not null && autocomplete.Any())
     /// 選択されたときに呼び出される
     /// </summary>
     /// <param name="value"></param>
-    void OnSelectItem(TVal value)
+    async Task OnSelectItemAsync(TVal value)
     {
-        autocomplete = default;
+        System.Diagnostics.Debug.WriteLine("selected");
         Value = value;
+        autocomplete = default;
+        await ValueChanged.InvokeAsync(Value);
     }
 }

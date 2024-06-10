@@ -1,44 +1,38 @@
 ﻿using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.CompilerServices;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Components.Web;
 
 namespace BlazorCustomInput.Components
 {
     /*
-    @using Microsoft.AspNetCore.Components.Web
-    @typeparam TVal
-    @inherits EditerText<TVal>
-
-    <input @attributes="AdditionalAttributes"
-            class="@CssClass"
-            @bind="@Value"
-            @bind:event="oninput"
-            @bind:after="OnInputAsync"
-            @onblur="OnLostFocus" />
-    
-    @if (autocomplete is not null && autocomplete.Any())
-    {
-        <br />
-        <span @onmouseover="(()=>isOut=false)" @onmouseleave="(()=>isOut=true)" >
-            <Cascad value="IsLoading">
-                <Cascad value="autocomplete">
-                    <AutocompelteFrame/>
-                </cascade>
-            </cascade>
-        </span>
-    }
+@using Microsoft.AspNetCore.Components.Web
+@typeparam TVal
+@inherits EditerText<TVal>
+<input @attributes="AdditionalAttributes"
+       class="@CssClass"
+       @bind="Value"
+       @bind:event="oninput"
+       @bind:after="OnInputAsync"
+       @onfocusout="OnFocusoutAsync" />
+    @if (IsLoading)
+{
+    <br />
+    @LoadingTemplate
+}
+else if (autocomplete is not null)
+{
+    <br />
+    @AutocompleteFrame(autocomplete)
+}
     */
     public partial class EditerAutocomplete<TVal> : EditerText<TVal>
     {
-        [Parameter]
-        public RenderFragment ChildContent { get; set; } = default!;
         /// <summary>
         /// 
         /// </summary>
         [Parameter]
-        public RenderFragment<AutocompleteFrame<TVal>> Frame { get; set; } = default!;
-        [Parameter]
-        public RenderFragment<IEnumerable<AutocompleteFrame<TVal>>> test { get; set; } = default!;
+        public RenderFragment<IEnumerable<AutocompleteArg<TVal>>> AutocompleteFrame { get; set; } = default!;
         /// <summary>
         /// 読み込み中
         /// </summary>
@@ -75,13 +69,9 @@ namespace BlazorCustomInput.Components
         /// </summary>
         List<AutocompleteArg<TVal>>? autocomplete { get; set; }
         /// <summary>
-        /// 
+        /// 読み込み中フラグ
         /// </summary>
-        bool isOut = true;
-        /// <summary>
-        /// 
-        /// </summary>
-        bool isLoading = true;
+        bool IsLoading = false;
 
         protected override void BuildRenderTree(RenderTreeBuilder builder)
         {
@@ -94,6 +84,7 @@ namespace BlazorCustomInput.Components
                 TextEditType.Password => "password",
                 _ => "text"
             };
+
             builder.OpenElement(index, "input");
             if (IsDisabled)
             {
@@ -102,8 +93,8 @@ namespace BlazorCustomInput.Components
             builder.AddMultipleAttributes(++index, AdditionalAttributes);
             builder.AddAttribute(++index, "type", editType);
             builder.AddAttribute(++index, "class", CssClass);
-            builder.AddAttribute(++index, "onblur", EventCallback.Factory.Create<global::Microsoft.AspNetCore.Components.Web.FocusEventArgs>(this, OnLostFocus));
-            builder.AddAttribute(++index, "value", BindConverter.FormatValue(CurrentValueAsString));
+            builder.AddAttribute(++index, "onfocusout", EventCallback.Factory.Create<FocusEventArgs>(this, OnFocusoutAsync));
+            builder.AddAttribute(++index, "value", BindConverter.FormatValue(Value));
             builder.AddAttribute(
                 ++index,
                 "oninput",
@@ -113,63 +104,55 @@ namespace BlazorCustomInput.Components
                         callback: __value =>
                         {
                             Value = __value;
+                            System.Diagnostics.Debug.WriteLine("input");
                             return Microsoft.AspNetCore.Components.CompilerServices.RuntimeHelpers.InvokeAsynchronousDelegate(callback: OnInputAsync);
                         },
                         value: Value),
-                    Value));
+                    Value)
+            );
+
             builder.SetUpdatesAttributeName("value");
+            //builder.AddElementReferenceCapture(++index, __inputReference => Element = __inputReference);
             builder.CloseElement();
-            if (isLoading)
+
+            if (IsLoading && LoadingTemplate is not null)
             {
+                builder.AddMarkupContent(++index, "\r\n<br>\r\n");
                 builder.AddContent(++index, LoadingTemplate);
                 return;
             }
-            if (autocomplete is not null && autocomplete.Any())
+            else if (autocomplete is not null && AutocompleteFrame is not null)
             {
                 builder.AddMarkupContent(++index, "\r\n<br>\r\n");
-                builder.OpenElement(++index, "span");
-                builder.AddAttribute(++index, "onmouseover", EventCallback.Factory.Create<MouseEventArgs>(this, (() => isOut = false)));
-                builder.AddAttribute(++index, "onmouseleave", EventCallback.Factory.Create<MouseEventArgs>(this, (() => isOut = true)));
-                builder.OpenComponent<CascadingValue<bool>>(++index);
-                builder.AddAttribute(++index, "Value", isLoading);
-                builder.AddAttribute(++index, "Name", "IsLoading");
-                builder.OpenComponent<CascadingValue<IEnumerable<AutocompleteArg<TVal>>>>(++index);
-                builder.AddAttribute(++index, "Value", autocomplete);
-                builder.AddAttribute(++index, "Name", "AutocompleteItems");
-                builder.AddAttribute(++index, nameof(Frame), (RenderFragment)((builder2) =>
-                {
-                }));
-                builder.CloseComponent();
-                builder.CloseComponent();
-                builder.CloseComponent();
-                builder.CloseElement();
+                builder.AddContent(++index, AutocompleteFrame(autocomplete));
             }
         }
+
         /// <summary>
         /// 確定
         /// </summary>
-        void OnLostFocus()
+        async Task OnFocusoutAsync()
         {
-            if (isOut)
-            {
-                autocomplete = default;
-                return;
-            }
+            System.Diagnostics.Debug.WriteLine("focusout");
+            await Task.Delay(500);
+            System.Diagnostics.Debug.WriteLine(Value);
+            if (CompleteCallBack.HasDelegate) await CompleteCallBack.InvokeAsync();
+            autocomplete = default;
         }
         /// <summary>
         /// リストの呼び出し
         /// </summary>
         async Task OnInputAsync()
         {
+            await ValueChanged.InvokeAsync(Value);
             try
             {
                 if (GetText(Value).Length >= MinTextLength && GetAutocomleteItems is not null)
                 {
-                    isLoading = true;
+                    IsLoading = true;
                     autocomplete = new();
                     var autocompleteItems = await GetAutocomleteItems(Value);
-                    autocomplete = new();
-                    autocomplete = autocompleteItems.Select(t => new AutocompleteArg<TVal>(t, false, EventCallback.Factory.Create<TVal>(this, OnSelectItem))).ToList();
+                    autocomplete = autocompleteItems.Select(t => new AutocompleteArg<TVal>(t, false, EventCallback.Factory.Create<TVal>(this, OnSelectItemAsync))).ToList();
                 }
                 else
                 {
@@ -178,17 +161,19 @@ namespace BlazorCustomInput.Components
             }
             finally
             {
-                isLoading = false;
+                IsLoading = false;
             }
         }
         /// <summary>
         /// 選択されたときに呼び出される
         /// </summary>
         /// <param name="value"></param>
-        void OnSelectItem(TVal value)
+        async Task OnSelectItemAsync(TVal value)
         {
-            autocomplete = default;
+            System.Diagnostics.Debug.WriteLine("selected");
             Value = value;
+            autocomplete = default;
+            await ValueChanged.InvokeAsync(Value);
         }
     }
 }

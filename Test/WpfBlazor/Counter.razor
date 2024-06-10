@@ -3,25 +3,27 @@
 @using BlazorCustomInput.Components
 <h1>Counter</h1>
 
-
-
-<TestEditAutcomplete CompleteCallBack="OnComplete" GetAutocomleteItems="OnSearch" @bind-Value="Model.Name">
+@Model.Name
+<EditerAutocomplete CompleteCallBack="OnComplete" GetAutocomleteItems="OnSearch" @bind-Value ="Model.Name" >
     <LoadingTemplate>
         <span>Loading</span>
     </LoadingTemplate>
-    <test>
+    <AutocompleteFrame>
         <div style="background-color:aqua">
             @foreach(var node in context)
             {
-                <p>@node.Value</p>
+                <p>
+                    <a @onclick="node.Selected">@node.Value</a>
+                </p>
             }
         </div>
-    </test>
-</TestEditAutcomplete>
+    </AutocompleteFrame>
+</EditerAutocomplete>
 
+<button @onclick="OnBtnClickAsync">debug</button>
 @code {
-    public BindModel Model { get; set; } = new();
-
+    public BindModel Model { get; set; } = new() {Id=5, Name = "hazimete" };
+    Microsoft.AspNetCore.Components.Forms.InputText input;
     List<BindModel> tests = new()
     {
         new BindModel{Name="アメリ小田原5",Id=1},
@@ -32,7 +34,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Model = new();
+        // Model = new();
         await base.OnInitializedAsync();
     }
 
@@ -42,8 +44,21 @@
         return tests.Where(t => t.Name.Contains(value)).Select(t => t.Name);
     }
 
-    void OnComplete()
+    async void OnComplete()
     {
-        System.Diagnostics.Debug.Assert(true);
+        await Task.Run(() =>
+        {
+            System.Diagnostics.Debug.WriteLine(Model.Name);
+        });
+
+        //System.Diagnostics.Debug.Assert(false);
+    }
+
+    async Task OnBtnClickAsync()
+    {
+        await Task.Run(() =>
+        {
+            System.Diagnostics.Debug.WriteLine("m "+Model.Name);
+        });
     }
 }

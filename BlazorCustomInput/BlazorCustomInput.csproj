@@ -12,9 +12,9 @@
     <AssemblyName>bcstmi</AssemblyName>
     <Version>0.9.0</Version>
   </PropertyGroup>
-	<!--	<PropertyGroup>
+    <PropertyGroup>
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-	</PropertyGroup>-->
+	</PropertyGroup>
 
   <ItemGroup>
     <SupportedPlatform Include="browser" />
