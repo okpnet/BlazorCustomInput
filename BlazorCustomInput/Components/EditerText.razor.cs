@@ -21,7 +21,7 @@ namespace BlazorCustomInput.Components
         /// May be <see langword="null"/> if accessed before the component is rendered.
         /// </para>
         /// </summary>
-        [DisallowNull] public ElementReference? Element { get; protected set; }
+        [DisallowNull] public ElementReference? Element { get=>componentElement; protected set=>componentElement=value; }
         /// <summary>
         /// コンストラクタ
         /// 型チェック｡GetStepAttrValがあれば評価いらない?
@@ -36,6 +36,11 @@ namespace BlazorCustomInput.Components
             }
         }
 
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+            if (firstRender && AutoFocus) await FocusAsync();
+        }
         /// <inheritdoc />
         protected override void BuildRenderTree(RenderTreeBuilder builder)
         {

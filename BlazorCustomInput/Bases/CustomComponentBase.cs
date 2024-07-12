@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.JSInterop;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq.Expressions;
@@ -17,9 +18,30 @@ namespace BlazorCustomInput.Base
         private bool _previousParsingAttemptFailed;
         private ValidationMessageStore? _parsingValidationMessages;
         private Type? _nullableUnderlyingType;
-
+        /// <summary>
+        /// this element.
+        /// </summary>
+        protected ElementReference? componentElement;
+        /// <summary>
+        /// JavaScriptモジュール
+        /// </summary>
+        IJSObjectReference? jsModule;
+        /// <summary>
+        /// JavascriotRuntimeインジェクション
+        /// </summary>
+        [Inject]
+        protected IJSRuntime JsRuntime { get; set; } = default!;
+        /// <summary>
+        /// 
+        /// </summary>
         [CascadingParameter]
         EditContext? CascadedEditContext { get; set; }
+
+        /// <summary>
+        /// input auto focus
+        /// </summary>
+        [Parameter]
+        public bool AutoFocus { get; set; } = false;
 
         /// <summary>
         /// Gets or sets a collection of additional attributes that will be applied to the created element.
@@ -187,7 +209,22 @@ namespace BlazorCustomInput.Base
         protected override void OnInitialized()
         {
             base.OnInitialized();
+        }
 
+        /// <summary>
+        /// JSモジュールの読み込み
+        /// </summary>
+        /// <param name="firstRender"></param>
+        /// <returns></returns>
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            if(firstRender) await JsLoadFocusModuleAsync();
+        }
+
+        public async ValueTask FocusAsync()
+        {
+            if(jsModule is null) await JsLoadFocusModuleAsync();
+            await jsModule!.InvokeVoidAsync(Define.JS_SET_FOCUS, componentElement);
         }
         /// <inheritdoc />
         /// OnInitializedよりも前｡最初に呼ばれる
@@ -238,6 +275,15 @@ namespace BlazorCustomInput.Base
 
             // For derived components, retain the usual lifecycle with OnInit/OnParametersSet/etc.
             return base.SetParametersAsync(ParameterView.Empty);
+        }
+        /// <summary>
+        /// load and set focus jsavascript modules
+        /// </summary>
+        /// <returns></returns>
+        private async Task JsLoadFocusModuleAsync()
+        {
+            var module = "export function " + Define.JS_SET_FOCUS + "(element) { return element !== null && typeof element === 'object' & '" + Define.JS_SET_FOCUS + "' in element ? element." + Define.JS_SET_FOCUS + "() : null;};";
+            jsModule ??=await JsRuntime.InvokeAsync<IJSObjectReference>("import", "data:text/javascript;charset=utf-8," + Uri.EscapeDataString(module));
         }
 
         private void OnValidateStateChanged(object? sender, ValidationStateChangedEventArgs eventArgs)
