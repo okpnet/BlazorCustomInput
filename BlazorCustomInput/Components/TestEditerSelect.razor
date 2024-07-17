@@ -1,0 +1,24 @@
+﻿@using Microsoft.AspNetCore.Components.Forms
+@typeparam T
+
+<InputSelect @bind-Value:get="selected" @bind-Value:set="SetSelected" class="form-control">
+    <option value="">Select an option</option>
+    @foreach (var value in ListOtherObjects)
+    {
+        <option value="@value.Id">@value.name</option>
+    }
+</InputSelect>
+
+@code {
+    private string selected = null!;
+    private List<T> ListOtherObjects = new();
+    public object objects { get; set; } = new();
+
+    void SetSelected(string value)
+    {
+        var _ = ListOtherObjects.Find(e => e.Id == value);
+        if (_ != null)
+            object.apple = _;
+        selected = value;
+    }
+}
