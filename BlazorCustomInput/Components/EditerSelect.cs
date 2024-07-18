@@ -68,6 +68,8 @@ namespace BlazorCustomInput.Components
             builder.AddElementReferenceCapture(++index, __inputReference => Element = __inputReference);
             builder.AddElementReferenceCapture(++index, __selectReference => Element = __selectReference);
             
+            if(BeforeOptionContent is not null)builder.AddContent(++index, BeforeOptionContent);
+
             foreach(var item in _source)
             {
                 var arg = new OptionArgment<Tval>(item);
@@ -92,8 +94,12 @@ namespace BlazorCustomInput.Components
                 builder.AddMarkupContent(++index, OptionString(arg.Value));
                 builder.CloseElement();
             }
+
+            if (AfterOptionContent is not null) builder.AddContent(++index, AfterOptionContent);
+
             builder.CloseElement();
         }
+
         protected override bool ConvetTo(string? value, out Tval? result)
         {
             if (value is null or "")
@@ -135,6 +141,11 @@ namespace BlazorCustomInput.Components
             CurrentValue = BindConverter.TryConvertTo<Tval>(_source.Where(t=>value.Contains(t.GetHashCode().ToString())).ToArray(), CultureInfo.CurrentCulture, out var result)
                 ? result
                 : default;
+        }
+
+        private void OnChange(string? value)
+        {
+
         }
     }
 }
