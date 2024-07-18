@@ -108,7 +108,7 @@ namespace BlazorCustomInput.Base
         /// <summary>
         /// Gets or sets the current value of the input, represented as a string.
         /// </summary>
-        protected string? CurrentValueAsString
+        protected virtual string? CurrentValueAsString
         {
             get => FormatValueAsString(CurrentValue);
             set

@@ -1,24 +1,29 @@
-﻿@using WpfBlazor
+﻿@using Microsoft.AspNetCore.Components.Forms
+@using WpfBlazor
 @using MW.Blazor
 @using BlazorCustomInput.Components
 <h1>Counter</h1>
 
+<EditForm Model="Model">
+    <EditerSelect Source="()=>tests" @bind-Value="Model" OptionString="@((val)=>val is null?"":$" {val.Name}({val.GetHashCode()})")"></EditerSelect>
 @Model.Name
 <EditerAutocomplete CompleteCallBack="OnComplete" GetAutocomleteItems="OnSearch" @bind-Value ="Model.Name" >
     <LoadingTemplate>
         <span>Loading</span>
     </LoadingTemplate>
-    <AutocompleteFrame>
-        <div style="background-color:aqua">
-            @foreach(var node in context)
-            {
-                <p>
-                    <a @onclick="node.Selected">@node.Value</a>
-                </p>
-            }
-        </div>
+    <AutocompleteFrame Context="model">
+            <div style="background-color:aqua">
+                @foreach (var node in model)
+                {
+                    <p>
+                        <a @onclick="node.Selected">@node.Value</a>
+                    </p>
+                }
+            </div>
     </AutocompleteFrame>
 </EditerAutocomplete>
+</EditForm>
+
 
 <button @onclick="OnBtnClickAsync">debug</button>
 @code {
@@ -32,16 +37,24 @@
         new BindModel{Name="アメリカ5",Id=4},
     };
 
+
+
+
     protected override async Task OnInitializedAsync()
     {
         // Model = new();
         await base.OnInitializedAsync();
     }
 
-    async Task<IEnumerable<string>> OnSearch(string value)
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+    }
+
+    async Task<string[]> OnSearch(string value)
     {
         await Task.Delay(2000);
-        return tests.Where(t => t.Name.Contains(value)).Select(t => t.Name);
+        return tests.Where(t => t.Name.Contains(value)).Select(t => t.Name).ToArray();
     }
 
     async void OnComplete()

@@ -42,7 +42,7 @@ else if (autocomplete is not null)
         /// オートコンプリートのリストを返す
         /// </summary>
         [Parameter]
-        public Func<TVal?, Task<IEnumerable<TVal>>> GetAutocomleteItems { get; set; } = default!;
+        public Func<TVal?, Task<TVal[]>> GetAutocomleteItems { get; set; } = default!;
         /// <summary>
         /// オートコンプリートが検索開始する文字数
         /// </summary>
