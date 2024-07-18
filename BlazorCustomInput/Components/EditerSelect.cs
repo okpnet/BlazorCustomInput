@@ -21,7 +21,11 @@ namespace BlazorCustomInput.Components
         /// </summary>
         [Parameter, EditorRequired]
         public Func<IEnumerable<Tval>> Source { get; set; } = default!;
+        [Parameter]
+        public RenderFragment? BeforeOptionContent { get; set; }
 
+        [Parameter]
+        public RenderFragment? AfterOptionContent { get; set; }
         /// <summary>
         /// Rendering string the options. 
         /// </summary>

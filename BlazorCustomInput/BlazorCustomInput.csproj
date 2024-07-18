@@ -16,7 +16,10 @@
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 	</PropertyGroup>
     <ItemGroup>
-      <Compile Include="..\..\..\CsLinqLibrary\LinqHelper\LinqHelper\LambdaExtension.cs" Link="LinqExt\LambdaExtension.cs" />
+      <Compile Remove="LinqExt\**" />
+      <Content Remove="LinqExt\**" />
+      <EmbeddedResource Remove="LinqExt\**" />
+      <None Remove="LinqExt\**" />
     </ItemGroup>
 
   <ItemGroup>
@@ -25,10 +28,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.6" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="LinqExt\" />
   </ItemGroup>
 
 </Project>
