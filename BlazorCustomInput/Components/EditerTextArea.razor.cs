@@ -11,13 +11,6 @@ namespace BlazorCustomInput.Components
     public partial class EditerTextArea<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Tval> : EditBase<Tval>
     {
         /// <summary>
-        /// Gets or sets the associated <see cref="ElementReference"/>.
-        /// <para>
-        /// May be <see langword="null"/> if accessed before the component is rendered.
-        /// </para>
-        /// </summary>
-        [DisallowNull] public ElementReference? Element { get; protected set; }
-        /// <summary>
         /// コンストラクタ
         /// 型チェック｡GetStepAttrValがあれば評価いらない?
         /// </summary>

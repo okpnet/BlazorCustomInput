@@ -60,13 +60,6 @@ namespace BlazorCustomInput.Components
         /// </summary>
         [Parameter]
         public bool Comma { get; set; } = false;
-        /// <summary>
-        /// Gets or sets the associated <see cref="ElementReference"/>.
-        /// <para>
-        /// May be <see langword="null"/> if accessed before the component is rendered.
-        /// </para>
-        /// </summary>
-        [DisallowNull] public ElementReference? Element { get; protected set; }
 
         /// <inheritdoc />
         protected override void BuildRenderTree(RenderTreeBuilder builder)

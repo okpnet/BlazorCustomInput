@@ -142,7 +142,7 @@ namespace BlazorCustomInput.Components
         {
             if (value is null || value.Length == 0) return;
 
-            CurrentValue = BindConverter.TryConvertTo<Tval>(_source.Where(t=>value.Contains(t.GetHashCode().ToString())).ToArray(), CultureInfo.CurrentCulture, out var result)
+            CurrentValue = BindConverter.TryConvertTo<Tval>(_source.Where(t=>value.Contains(t!.GetHashCode().ToString())).ToArray(), CultureInfo.CurrentCulture, out var result)
                 ? result
                 : default;
         }
