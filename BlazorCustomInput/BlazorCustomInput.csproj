@@ -10,10 +10,11 @@
     <Company>hayato takahahsi</Company>
     <Product>BlazorCustomInput</Product>
     <AssemblyName>bcstmi</AssemblyName>
-    <Version>0.9.0</Version>
+    <Version>0.9.1</Version>
   </PropertyGroup>
     <PropertyGroup>
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+		<Title>BlazorCustomInput</Title>
 	</PropertyGroup>
     <ItemGroup>
       <Compile Remove="LinqExt\**" />
