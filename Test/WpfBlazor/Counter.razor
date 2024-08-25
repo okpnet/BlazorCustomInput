@@ -7,7 +7,7 @@
 <EditForm Model="Model">
     <EditerSelect Source="()=>tests" @bind-Value="Model" OptionString="@((val)=>val is null?"":$" {val.Name}({val.GetHashCode()})")" @onchange="OnChangeEvent">
     </EditerSelect>
-@Model.Name
+
 <EditerAutocomplete CompleteCallBack="OnComplete" GetAutocomleteItems="OnSearch" @bind-Value ="Model.Name" >
     <LoadingTemplate>
         <span>Loading</span>
@@ -24,7 +24,7 @@
     </AutocompleteFrame>
 </EditerAutocomplete>
 </EditForm>
-
+<p>@Model.Name</p>
 
 <button @onclick="OnBtnClickAsync">debug</button>
 @code {

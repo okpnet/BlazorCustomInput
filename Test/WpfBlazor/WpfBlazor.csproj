@@ -7,7 +7,9 @@
     <UseWPF>true</UseWPF>
     <RootNamespace>WpfBlazor</RootNamespace>
   </PropertyGroup>
-
+	<PropertyGroup>
+		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+	</PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Wpf" Version="8.0.40" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
