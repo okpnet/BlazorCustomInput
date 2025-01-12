@@ -96,10 +96,11 @@ namespace BlazorCustomInput.Components
             //indeterminateを結合
             var cssClass = string.Join(' ', CssClass, IsIndeterminate ? "is-indeterminate" : "");
 
-            builder.OpenElement(index, "input"); ++index;
+            builder.OpenElement(index, "input"); 
+            ++index;
             if (IsDisabled)
             {
-                builder.AddAttribute(++index, "disabled");
+                builder.AddAttribute(index, "disabled");
             }
             builder.AddMultipleAttributes(++index, AdditionalAttributes);
             builder.AddAttribute(++index, "type", "checkbox");

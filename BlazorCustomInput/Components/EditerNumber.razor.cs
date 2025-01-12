@@ -67,14 +67,16 @@ namespace BlazorCustomInput.Components
         {
             var index = 0;
             builder.OpenElement(index, "input");
+            ++index;
             if (IsDisabled)
             {
-                builder.AddAttribute(++index, "diasabled");
+                builder.AddAttribute(index, "diasabled");
             }
             builder.AddAttribute(++index, "step", _stepAttrVal);
+            ++index;
             if (IsMin is not null)
             {
-                builder.AddAttribute(++index, "min", BindConverter.FormatValue(IsMin.Value));
+                builder.AddAttribute(index, "min", BindConverter.FormatValue(IsMin.Value));
             }
 
             builder.AddAttribute(++index, "max", BindConverter.FormatValue(GetMaxSize()));

@@ -86,9 +86,10 @@ else if (autocomplete is not null)
             };
 
             builder.OpenElement(index, "input");
+            index++;
             if (IsDisabled)
             {
-                builder.AddAttribute(++index, "diasabled");
+                builder.AddAttribute(index, "diasabled");
             }
             builder.AddMultipleAttributes(++index, AdditionalAttributes);
             builder.AddAttribute(++index, "type", editType);
@@ -113,7 +114,7 @@ else if (autocomplete is not null)
             builder.SetUpdatesAttributeName("value");
             builder.AddElementReferenceCapture(++index, __inputReference => Element = __inputReference);
             builder.CloseElement();
-
+            
             if (IsLoading && LoadingTemplate is not null)
             {
                 builder.AddMarkupContent(++index, "\r\n<br>\r\n");

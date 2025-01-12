@@ -82,24 +82,27 @@ namespace BlazorCustomInput.Components
                     BeforeOptionRender(arg);
                 }
                 builder.OpenElement(++index, "option");
+                ++index;
                 if (arg.IsDisable)
                 {
-                    builder.AddAttribute(++index, "diable", arg.IsDisable);
+                    builder.AddAttribute(index, "diable", arg.IsDisable);
                 }
-                if(arg.CssClass is not (null or ""))
+                ++index;
+                if (arg.CssClass is not (null or ""))
                 {
-                    builder.AddAttribute(++index, "class", arg.CssClass);
+                    builder.AddAttribute(index, "class", arg.CssClass);
                 }
+                ++index;
                 if (arg.AdditionalAttributes.Count>0)
                 {
-                    builder.AddMultipleAttributes(++index, arg.AdditionalAttributes);
+                    builder.AddMultipleAttributes(index, arg.AdditionalAttributes);
                 }
                 builder.AddAttribute(++index, "value", item?.GetHashCode());
                 builder.AddMarkupContent(++index, OptionString(arg.Value));
                 builder.CloseElement();
             }
 
-            if (AfterOptionContent is not null) builder.AddContent(++index, AfterOptionContent);
+            if (AfterOptionContent is not null) builder.AddContent(10000, AfterOptionContent);
 
             builder.CloseElement();
         }

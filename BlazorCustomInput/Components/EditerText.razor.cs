@@ -48,9 +48,10 @@ namespace BlazorCustomInput.Components
                 _ => "text"
             };
             builder.OpenElement(index, "input");
+            ++index;
             if (IsDisabled)
             {
-                builder.AddAttribute(++index, "diasabled");
+                builder.AddAttribute(index, "diasabled");
             }
             builder.AddMultipleAttributes(++index, AdditionalAttributes);
             builder.AddAttribute(++index, "type", editType);
