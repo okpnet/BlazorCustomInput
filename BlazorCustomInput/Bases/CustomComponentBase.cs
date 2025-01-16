@@ -100,7 +100,7 @@ namespace BlazorCustomInput.Base
                 {
                     Value = value;
                     _ = ValueChanged.InvokeAsync(Value);
-                    EditContext.NotifyFieldChanged(FieldIdentifier);
+                    EditContext?.NotifyFieldChanged(FieldIdentifier);
                 }
             }
         }

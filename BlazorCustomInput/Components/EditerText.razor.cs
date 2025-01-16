@@ -1,5 +1,6 @@
 ﻿using BlazorCustomInput.Base;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.CompilerServices;
 using Microsoft.AspNetCore.Components.Rendering;
 using System.Diagnostics.CodeAnalysis;
 
@@ -15,7 +16,12 @@ namespace BlazorCustomInput.Components
         /// </summary>
         [Parameter]
         public TextEditType EditType { get; set; } = TextEditType.Text;
-
+        /// <summary>
+        /// 入力中の即時更新をOnにする
+        /// 入力中にEditContext?.NotifyFieldChangedが呼ばれるので注意。
+        /// </summary>
+        [Parameter]
+        public bool IsImmediateUpdate { get; set; } = true;
         /// <summary>
         /// コンストラクタ
         /// 型チェック｡GetStepAttrValがあれば評価いらない?
@@ -48,7 +54,7 @@ namespace BlazorCustomInput.Components
                 _ => "text"
             };
             builder.OpenElement(index, "input");
-            ++index;
+            index+=1;
             if (IsDisabled)
             {
                 builder.AddAttribute(index, "diasabled");
@@ -58,6 +64,26 @@ namespace BlazorCustomInput.Components
             builder.AddAttribute(++index, "class", CssClass);
             builder.AddAttribute(++index, "value", BindConverter.FormatValue(CurrentValueAsString));
             builder.AddAttribute(++index, "onchange", EventCallback.Factory.CreateBinder<string?>(this, __value => CurrentValueAsString = __value, CurrentValueAsString));
+            index += 1;
+            if (IsImmediateUpdate)
+            {
+                //フォーカスが外れなくても変更がわかるように追加
+                builder.AddAttribute(
+                    index,
+                    "oninput",
+                    EventCallback.Factory.CreateBinder(
+                        this,
+                        RuntimeHelpers.CreateInferredBindSetter(
+                            callback: __value =>
+                            {
+                                CurrentValue = __value;
+                                return Task.CompletedTask;
+                            },
+                            value: Value),
+                        Value)
+                );
+            }
+            
             builder.AddElementReferenceCapture(++index, __inputReference => Element = __inputReference);
 
             builder.CloseElement();
