@@ -149,10 +149,5 @@ namespace BlazorCustomInput.Components
                 ? result
                 : default;
         }
-
-        private void OnChange(string? value)
-        {
-
-        }
     }
 }
