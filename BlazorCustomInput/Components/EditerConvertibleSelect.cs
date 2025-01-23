@@ -43,7 +43,7 @@ namespace BlazorCustomInput.Components
         /// option content
         /// </summary>
         [Parameter, Required]
-        public RenderFragment OptionContent { get; set; } = default!;
+        public RenderFragment<TSource?> OptionContent { get; set; } = default!;
 
         public EditerConvertibleSelect()
         {
@@ -84,31 +84,18 @@ namespace BlazorCustomInput.Components
             foreach(var item in _source)
             {
                 var value = Converter(item);
-                var arg = new OptionArgment<Tval>(value);
-                
+                var arg = new OptionArgment<TSource>(item);
+                builder.OpenElement(index++, "option");
+                index += 1;
                 if (item is null)
                 {
-                    builder.OpenElement(index++, "option");
-                    builder.AddContent(index++, NullOptionContents);
-                    builder.CloseElement();
+                    builder.AddContent(index, NullOptionContents);
                 }
                 else
                 {
-                    index += 3;
-                    builder.OpenComponent<CascadingValue<int>>(index++);
-                    builder.AddAttribute(index++, nameof(CascadingValue<int>.Value), item.GetHashCode());
-                    builder.AddAttribute(index++, nameof(CascadingValue<int>.Name), nameof(ConvertibleOption<Tval>.ValueId));
-                    builder.AddAttribute(index++, nameof(CascadingValue<int>.ChildContent), (RenderFragment)((builder2) =>
-                    {
-                        builder2.OpenComponent<CascadingValue<int>>(index++);
-                        builder2.AddAttribute(index++, nameof(CascadingValue<int>.Value), value);
-                        builder2.AddAttribute(index++, nameof(CascadingValue<int>.Name), nameof(ConvertibleOption<Tval>.Value));
-                        builder2.AddAttribute(index++, nameof(CascadingValue<int>.ChildContent), (RenderFragment)((builder3) =>
-                        {
-                            builder3.AddContent(index++, OptionContent);
-                        }));
-                    }));
+                    builder.AddContent(index, OptionContent, item);
                 }
+                builder.CloseElement();
             }
             builder.CloseElement();
         }

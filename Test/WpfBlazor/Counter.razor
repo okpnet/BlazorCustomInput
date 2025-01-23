@@ -23,15 +23,16 @@
             </div>
     </AutocompleteFrame>
 </EditerAutocomplete>
-<EditerConvertibleSelect @bind-Value="id" Source="()=>tests" Converter="@((a)=>a.Id)">
-    <OptionContent>
-        <ConvertibleOption Context="val">
-            @(val)
-        </ConvertibleOption>
-    </OptionContent>
-</EditerConvertibleSelect>
-</EditForm>
 
+</EditForm>
+<EditerConvertibleSelect  @bind-Value="id" Source="()=>tests" Converter="@((a)=>a.Id)">
+    <OptionContent Context="val">
+        @val.Name
+    </OptionContent>
+    <NullOptionContents >
+        Null
+    </NullOptionContents>
+</EditerConvertibleSelect>
 <p>@Model.Name</p>
 
 <button @onclick="OnBtnClickAsync">debug</button>
