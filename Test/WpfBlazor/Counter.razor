@@ -23,11 +23,20 @@
             </div>
     </AutocompleteFrame>
 </EditerAutocomplete>
+<EditerConvertibleSelect @bind-Value="id" Source="()=>tests" Converter="@((a)=>a.Id)">
+    <OptionContent>
+        <ConvertibleOption Context="val">
+            @(val)
+        </ConvertibleOption>
+    </OptionContent>
+</EditerConvertibleSelect>
 </EditForm>
+
 <p>@Model.Name</p>
 
 <button @onclick="OnBtnClickAsync">debug</button>
 @code {
+    int id;
     public BindModel Model { get; set; } = new() {Id=5, Name = "hazimete" };
     Microsoft.AspNetCore.Components.Forms.InputText input;
     List<BindModel> tests = new()
