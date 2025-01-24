@@ -28,7 +28,7 @@
 <EditerConvertibleSelect ChoosePromptContents="choose..." @bind-Value="id" OptionContents="(a)=>a.Name" Source="()=>tests" ValueConverter="@((a)=>a.Id)">
 </EditerConvertibleSelect>
 <p>@Model.Name</p>
-
+<p>@id</p>
 <button @onclick="OnBtnClickAsync">debug</button>
 @code {
     int id=2;
