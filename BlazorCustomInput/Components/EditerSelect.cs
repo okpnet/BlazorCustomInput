@@ -42,6 +42,8 @@ namespace BlazorCustomInput.Components
         protected override void BuildRenderTree(RenderTreeBuilder builder)
         {
             int index = 0;
+            var selectedItem = _source.FirstOrDefault(t => Equals(t, Value));
+
             builder.OpenElement(++index, "select");
             builder.AddMultipleAttributes(++index, AdditionalAttributes);
             builder.AddAttribute(++index, "class", CssClass);
@@ -79,6 +81,10 @@ namespace BlazorCustomInput.Components
             {
                 builder.OpenElement(++index, "option");
                 builder.AddAttribute(++index, "value", item?.GetHashCode());
+                if (selectedItem is not null && Equals(selectedItem, item))
+                {
+                    builder.AddAttribute(++index, "selected");
+                }
                 builder.AddMarkupContent(++index, OptionContents(item));
                 builder.CloseElement();
             }
