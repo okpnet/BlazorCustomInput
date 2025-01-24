@@ -26,7 +26,7 @@ namespace BlazorCustomInput.Components
         /// Argment null value contents.
         /// </summary>
         [Parameter]
-        public string? SelectOptionContents { get; set; }
+        public string? ChoosePromptContents { get; set; }
 
         public EditerSelect()
         {
@@ -65,11 +65,11 @@ namespace BlazorCustomInput.Components
             builder.AddElementReferenceCapture(++index, __inputReference => Element = __inputReference);
             builder.AddElementReferenceCapture(++index, __selectReference => Element = __selectReference);
             
-            if (SelectOptionContents is not (null or ""))
+            if (ChoosePromptContents is not (null or ""))
             {
                 builder.OpenElement(index++, "option");
                 builder.AddAttribute(index++, "hidden");
-                builder.AddMarkupContent(index++, SelectOptionContents);
+                builder.AddMarkupContent(index++, ChoosePromptContents);
                 builder.CloseElement();
             }
             else

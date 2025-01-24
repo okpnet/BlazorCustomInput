@@ -25,7 +25,7 @@
 </EditerAutocomplete>
 
 </EditForm>
-<EditerConvertibleSelect SelectOptionContents="choose..." @bind-Value="id" OptionContents="(a)=>a.Name" Source="()=>tests" ValueConverter="@((a)=>a.Id)">
+<EditerConvertibleSelect ChoosePromptContents="choose..." @bind-Value="id" OptionContents="(a)=>a.Name" Source="()=>tests" ValueConverter="@((a)=>a.Id)">
 </EditerConvertibleSelect>
 <p>@Model.Name</p>
 
