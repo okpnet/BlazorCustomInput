@@ -13,29 +13,20 @@ namespace BlazorCustomInput.Components
         private IEnumerable<Tval> _source;
 
         /// <summary>
-        /// Gets or sets the child content to be rendering inside the select element.
-        /// </summary>
-        [Parameter] public RenderFragment? ChildContent { get; set; }
-        /// <summary>
         /// Gets source to a select option. 
         /// </summary>
         [Parameter, EditorRequired]
         public Func<IEnumerable<Tval>> Source { get; set; } = default!;
-        [Parameter]
-        public RenderFragment? BeforeOptionContent { get; set; }
-
-        [Parameter]
-        public RenderFragment? AfterOptionContent { get; set; }
         /// <summary>
         /// Rendering string the options. 
         /// </summary>
         [Parameter, EditorRequired]
-        public Func<Tval?, string> OptionString { get; set; } = default!;
+        public Func<Tval?, string> OptionContents { get; set; } = default!;
         /// <summary>
-        /// Action before rendering the options. 
+        /// Argment null value contents.
         /// </summary>
         [Parameter]
-        public Action<OptionArgment<Tval>> BeforeOptionRender { get; set; } = default!;
+        public string? SelectOptionContents { get; set; }
 
         public EditerSelect()
         {
@@ -72,38 +63,25 @@ namespace BlazorCustomInput.Components
             builder.AddElementReferenceCapture(++index, __inputReference => Element = __inputReference);
             builder.AddElementReferenceCapture(++index, __selectReference => Element = __selectReference);
             
-            if(BeforeOptionContent is not null)builder.AddContent(++index, BeforeOptionContent);
-
-            foreach(var item in _source)
+            if (SelectOptionContents is not (null or ""))
             {
-                var arg = new OptionArgment<Tval>(item);
-                if(BeforeOptionRender is not null)
-                {
-                    BeforeOptionRender(arg);
-                }
-                builder.OpenElement(++index, "option");
-                ++index;
-                if (arg.IsDisable)
-                {
-                    builder.AddAttribute(index, "diable", arg.IsDisable);
-                }
-                ++index;
-                if (arg.CssClass is not (null or ""))
-                {
-                    builder.AddAttribute(index, "class", arg.CssClass);
-                }
-                ++index;
-                if (arg.AdditionalAttributes.Count>0)
-                {
-                    builder.AddMultipleAttributes(index, arg.AdditionalAttributes);
-                }
-                builder.AddAttribute(++index, "value", item?.GetHashCode());
-                builder.AddMarkupContent(++index, OptionString(arg.Value));
+                builder.OpenElement(index++, "option");
+                builder.AddAttribute(index++, "hidden");
+                builder.AddMarkupContent(index++, SelectOptionContents);
                 builder.CloseElement();
             }
+            else
+            {
+                index += 4;
+            }
 
-            if (AfterOptionContent is not null) builder.AddContent(10000, AfterOptionContent);
-
+            foreach (var item in _source)
+            {
+                builder.OpenElement(++index, "option");
+                builder.AddAttribute(++index, "value", item?.GetHashCode());
+                builder.AddMarkupContent(++index, OptionContents(item));
+                builder.CloseElement();
+            }
             builder.CloseElement();
         }
 

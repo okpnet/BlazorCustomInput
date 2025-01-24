@@ -2,7 +2,6 @@
 using BlazorCustomInput.Base;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
-using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
@@ -18,7 +17,6 @@ namespace BlazorCustomInput.Components
     {
         private readonly bool _isMultipleSelect;
         private IEnumerable<TSource> _source;
-
         /// <summary>
         /// Gets or sets the child content to be rendering inside the select element.
         /// </summary>
@@ -32,22 +30,21 @@ namespace BlazorCustomInput.Components
         /// The delegate is TSource convert to TVal.
         /// </summary>
         [Parameter, EditorRequired]
-        public Func<TSource,Tval> Converter { get; set; } = default!;
-
+        public Func<TSource,Tval> ValueConverter { get; set; } = default!;
         /// <summary>
         /// Argment null value contents.
         /// </summary>
         [Parameter]
-        public RenderFragment? NullOptionContents { get; set; }
+        public string? SelectOptionContents { get; set; }
         /// <summary>
-        /// option content
+        /// Rendering string the options. 
         /// </summary>
-        [Parameter, Required]
-        public RenderFragment<TSource?> OptionContent { get; set; } = default!;
+        [Parameter, EditorRequired]
+        public Func<TSource?, string> OptionContents { get; set; } = default!;
 
         public EditerConvertibleSelect()
         {
-            _isMultipleSelect = typeof(Tval).IsArray;
+            _isMultipleSelect = typeof(TSource).IsArray;
             _source=Enumerable.Empty<TSource>();
         }
 
@@ -81,20 +78,29 @@ namespace BlazorCustomInput.Components
             builder.AddElementReferenceCapture(index++, __inputReference => Element = __inputReference);
             builder.AddElementReferenceCapture(index++, __selectReference => Element = __selectReference);
 
+            if(SelectOptionContents is not (null or ""))
+            {
+                builder.OpenElement(index++, "option");
+                builder.AddAttribute(index++, "hidden");
+                builder.AddMarkupContent(index++, SelectOptionContents);
+                builder.CloseElement();
+            }
+            else
+            {
+                index += 4;
+            }
+
             foreach(var item in _source)
             {
-                var value = Converter(item);
+                if(item is null)
+                {
+                    continue;
+                }
+                var value = ValueConverter(item);
                 var arg = new OptionArgment<TSource>(item);
                 builder.OpenElement(index++, "option");
-                index += 1;
-                if (item is null)
-                {
-                    builder.AddContent(index, NullOptionContents);
-                }
-                else
-                {
-                    builder.AddContent(index, OptionContent, item);
-                }
+                builder.AddAttribute(index++, "value", item.GetHashCode());
+                builder.AddMarkupContent(index++, OptionContents(item));
                 builder.CloseElement();
             }
             builder.CloseElement();
@@ -116,7 +122,7 @@ namespace BlazorCustomInput.Components
                     if (current is null) continue;
                     if (current.GetHashCode().ToString() == value)
                     {
-                        result =Converter(current);
+                        result = ValueConverter(current);
                         return true;
                     }
                 }
@@ -125,7 +131,7 @@ namespace BlazorCustomInput.Components
             }
         }
 
-        protected override string? FormatValueAsString(Tval? value)=> value?.GetHashCode().ToString();
+        protected override string? FormatValueAsString(Tval? value)=> _source.FirstOrDefault(t=>Equals(ValueConverter(t),value))?.GetHashCode().ToString();
 
         protected override bool TryParseValueFromString(string? value, [MaybeNullWhen(false)] out Tval result, [NotNullWhen(false)] out string? validationErrorMessage)
         {

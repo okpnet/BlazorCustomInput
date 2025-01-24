@@ -96,10 +96,13 @@ namespace BlazorCustomInput.Base
             set
             {
                 var hasChanged = !EqualityComparer<TValue>.Default.Equals(value, Value);
+                //エディットコンテキストに関係無く入力できるようにした。
+                Value = value;
+                _ = ValueChanged.InvokeAsync(Value);
                 if (EditContext is not null && hasChanged)
                 {
-                    Value = value;
-                    _ = ValueChanged.InvokeAsync(Value);
+                    //Value = value;
+                    //_ = ValueChanged.InvokeAsync(Value);
                     EditContext?.NotifyFieldChanged(FieldIdentifier);
                 }
             }
@@ -378,5 +381,7 @@ namespace BlazorCustomInput.Base
 
             Dispose(disposing: true);
         }
+
+        
     }
 }

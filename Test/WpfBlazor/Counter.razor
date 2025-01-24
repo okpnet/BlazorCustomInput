@@ -5,7 +5,7 @@
 <h1>Counter</h1>
 
 <EditForm Model="Model">
-    <EditerSelect Source="()=>tests" @bind-Value="Model" OptionString="@((val)=>val is null?"":$" {val.Name}({val.GetHashCode()})")" @onchange="OnChangeEvent">
+    <EditerSelect Source="()=>tests" @bind-Value="Model" OptionContents="@((val)=>val is null?"":$" {val.Name}({val.GetHashCode()})")" @onchange="OnChangeEvent">
     </EditerSelect>
 
 <EditerAutocomplete CompleteCallBack="OnComplete" GetAutocomleteItems="OnSearch" @bind-Value ="Model.Name" >
@@ -25,19 +25,13 @@
 </EditerAutocomplete>
 
 </EditForm>
-<EditerConvertibleSelect  @bind-Value="id" Source="()=>tests" Converter="@((a)=>a.Id)">
-    <OptionContent Context="val">
-        @val.Name
-    </OptionContent>
-    <NullOptionContents >
-        Null
-    </NullOptionContents>
+<EditerConvertibleSelect SelectOptionContents="choose..." @bind-Value="id" OptionContents="(a)=>a.Name" Source="()=>tests" ValueConverter="@((a)=>a.Id)">
 </EditerConvertibleSelect>
 <p>@Model.Name</p>
 
 <button @onclick="OnBtnClickAsync">debug</button>
 @code {
-    int id;
+    int id=-1;
     public BindModel Model { get; set; } = new() {Id=5, Name = "hazimete" };
     Microsoft.AspNetCore.Components.Forms.InputText input;
     List<BindModel> tests = new()
