@@ -87,10 +87,7 @@ else if (autocomplete is not null)
 
             builder.OpenElement(index, "input");
             index++;
-            if (IsDisabled)
-            {
-                builder.AddAttribute(index, "diasabled");
-            }
+            builder.AddAttribute(index, "disabled", IsDisabled);
             builder.AddMultipleAttributes(++index, AdditionalAttributes);
             builder.AddAttribute(++index, "type", editType);
             builder.AddAttribute(++index, "class", CssClass);

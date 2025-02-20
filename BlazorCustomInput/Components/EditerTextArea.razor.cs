@@ -37,10 +37,7 @@ namespace BlazorCustomInput.Components
             var index = 0;
             builder.OpenElement(index, "textarea");
             index+=1;
-            if (IsDisabled)
-            {
-                builder.AddAttribute(++index, "diasabled");
-            }
+            builder.AddAttribute(index, "disabled", IsDisabled);
             builder.AddMultipleAttributes(++index, AdditionalAttributes);
             builder.AddAttribute(++index, "class", CssClass);
             builder.AddAttribute(++index, "value", BindConverter.FormatValue(CurrentValueAsString));

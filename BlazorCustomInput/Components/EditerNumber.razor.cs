@@ -68,10 +68,7 @@ namespace BlazorCustomInput.Components
             var index = 0;
             builder.OpenElement(index, "input");
             ++index;
-            if (IsDisabled)
-            {
-                builder.AddAttribute(index, "diasabled");
-            }
+            builder.AddAttribute(index, "disabled", IsDisabled);
             builder.AddAttribute(++index, "step", _stepAttrVal);
             ++index;
             if (IsMin is not null)

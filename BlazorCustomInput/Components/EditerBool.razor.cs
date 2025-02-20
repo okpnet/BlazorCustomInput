@@ -98,10 +98,7 @@ namespace BlazorCustomInput.Components
 
             builder.OpenElement(index, "input"); 
             ++index;
-            if (IsDisabled)
-            {
-                builder.AddAttribute(index, "disabled");
-            }
+            builder.AddAttribute(index, "disabled", IsDisabled);
             builder.AddMultipleAttributes(++index, AdditionalAttributes);
             builder.AddAttribute(++index, "type", "checkbox");
             builder.AddAttribute(++index, "class", cssClass);

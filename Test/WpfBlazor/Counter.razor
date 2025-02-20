@@ -5,10 +5,10 @@
 <h1>Counter</h1>
 
 <EditForm Model="Model">
-    <EditerSelect Source="()=>tests" @bind-Value="Model" OptionContents="@((val)=>val is null?"":$" {val.Name}({val.GetHashCode()})")" @onchange="OnChangeEvent">
+    <EditerSelect IsDisabled="true" Source="()=>tests" @bind-Value="Model" OptionContents="@((val)=>val is null?"":$" {val.Name}({val.GetHashCode()})")" @onchange="OnChangeEvent">
     </EditerSelect>
 
-<EditerAutocomplete CompleteCallBack="OnComplete" GetAutocomleteItems="OnSearch" @bind-Value ="Model.Name" >
+    <EditerAutocomplete IsDisabled="true" CompleteCallBack="OnComplete" GetAutocomleteItems="OnSearch" @bind-Value="Model.Name">
     <LoadingTemplate>
         <span>Loading</span>
     </LoadingTemplate>
@@ -25,7 +25,7 @@
 </EditerAutocomplete>
 
 </EditForm>
-<EditerConvertibleSelect ChoosePromptContents="choose..." @bind-Value="id" OptionContents="(a)=>a.Name" Source="()=>tests" ValueConverter="@((a)=>a.Id)">
+<EditerConvertibleSelect IsDisabled="true" ChoosePromptContents="choose..." @bind-Value="id" OptionContents="(a)=>a.Name" Source="()=>tests" ValueConverter="@((a)=>a.Id)">
 </EditerConvertibleSelect>
 <p>@Model.Name</p>
 <p>@id</p>

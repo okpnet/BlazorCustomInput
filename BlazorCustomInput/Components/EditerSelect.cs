@@ -47,6 +47,7 @@ namespace BlazorCustomInput.Components
             builder.OpenElement(++index, "select");
             builder.AddMultipleAttributes(++index, AdditionalAttributes);
             builder.AddAttribute(++index, "class", CssClass);
+            builder.AddAttribute(index, "disabled", IsDisabled);
             builder.AddAttribute(++index, "multiple", _isMultipleSelect);
 
             if (_isMultipleSelect)
