@@ -5,10 +5,10 @@
 <h1>Counter</h1>
 
 <EditForm Model="Model">
-    <EditerSelect IsDisabled="true" Source="()=>tests" @bind-Value="Model" OptionContents="@((val)=>val is null?"":$" {val.Name}({val.GetHashCode()})")" @onchange="OnChangeEvent">
+    <EditerSelect IsDisabled="false" Source="()=>tests" @bind-Value="Model" OptionContents="@((val)=>val is null?"":$" {val.Name}({val.GetHashCode()})")" @onchange="OnChangeEvent">
     </EditerSelect>
 
-    <EditerAutocomplete IsDisabled="true" CompleteCallBack="OnComplete" GetAutocomleteItems="OnSearch" @bind-Value="Model.Name">
+    <EditerAutocomplete CompleteCallBack="OnComplete" GetAutocomleteItems="OnSearch" @bind-Value="Model.Name">
     <LoadingTemplate>
         <span>Loading</span>
     </LoadingTemplate>
