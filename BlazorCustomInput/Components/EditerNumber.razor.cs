@@ -45,12 +45,12 @@ namespace BlazorCustomInput.Components
         /// 最小
         /// </summary>
         [Parameter]
-        public decimal? IsMin { get; set; }
+        public decimal? MinValue { get; set; }
         /// <summary>
         /// 最大
         /// </summary>
         [Parameter]
-        public decimal? IsMax { get; set; }
+        public decimal? MaxValue { get; set; }
         /// <summary>
         /// 小数点以下桁
         /// </summary>
@@ -71,9 +71,9 @@ namespace BlazorCustomInput.Components
             builder.AddAttribute(index, "disabled", IsDisabled);
             builder.AddAttribute(++index, "step", _stepAttrVal);
             ++index;
-            if (IsMin is not null)
+            if (MinValue is not null)
             {
-                builder.AddAttribute(index, "min", BindConverter.FormatValue(IsMin.Value));
+                builder.AddAttribute(index, "min", BindConverter.FormatValue(MinValue.Value));
             }
 
             builder.AddAttribute(++index, "max", BindConverter.FormatValue(GetMaxSize()));
@@ -133,7 +133,7 @@ namespace BlazorCustomInput.Components
         /// <returns></returns>
         string GetMaxSize()
         {
-            if (IsMax is not null || IsMax > 0) return IsMax.Value.ToString();
+            if (MaxValue is not null || MaxValue > 0) return MaxValue.Value.ToString();
             return NumberExtention.GetMaxsize<Tval>();
         }
     }

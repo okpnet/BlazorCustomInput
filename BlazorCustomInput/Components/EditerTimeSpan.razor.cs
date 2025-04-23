@@ -49,7 +49,7 @@ namespace BlazorCustomInput.Components
         /// 最大値
         /// </summary>
         [Parameter]
-        public int? IsMax { get; set; }
+        public decimal? MaxValue { get; set; }
         /// <summary>
         /// 小数点以下桁
         /// </summary>
@@ -177,7 +177,7 @@ namespace BlazorCustomInput.Components
         /// <returns></returns>
         string GetMaxSize()
         {
-            if (IsMax is not null || IsMax > 0) return IsMax.Value.ToString();
+            if (MaxValue is not null || MaxValue > 0) return MaxValue.Value.ToString();
             return NumberExtention.GetMaxsize<Tval>();
         }
     }
