@@ -45,14 +45,7 @@ namespace BlazorCustomInput.Components
         protected override void BuildRenderTree(RenderTreeBuilder builder)
         {
             var index = 0;
-            var editType = EditType switch
-            {
-                TextEditType.Email => "email",
-                TextEditType.Url => "url",
-                TextEditType.Number => "number",
-                TextEditType.Password => "password",
-                _ => "text"
-            };
+            var editType = EditType.GetTypeString();
             builder.OpenElement(index, "input");
             index+=1;
             builder.AddAttribute(index, "disabled", IsDisabled);
