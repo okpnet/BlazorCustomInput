@@ -16,7 +16,21 @@ namespace BlazorCustomInput.Components
         /// <summary>
         /// チェックボックスチェック
         /// </summary>
-        protected bool IsCheck { get; set; } = false;
+        private bool _isCheck;
+        protected bool IsCheck
+        {
+            get => _isCheck;
+            set
+            {
+                if (_isCheck != value)
+                {
+                    _isCheck = value;
+                    CurrentValue = _isCheck
+                        ? (TrueValue is not null ? (Tval)(object)TrueValue : default)
+                        : (FalseValue is not null ? (Tval)(object)FalseValue : default);
+                }
+            }
+        }
         #endregion
         /// <summary>
         /// True値
@@ -79,20 +93,21 @@ namespace BlazorCustomInput.Components
         protected override void BuildRenderTree(RenderTreeBuilder builder)
         {
             var index = 0;
-            if (IsCheck)
-            {
-                if (TrueValue is not null)
-                    CurrentValue = (Tval)(object)TrueValue;
-                else
-                    CurrentValue = default;
-            }
-            else
-            {
-                if (FalseValue is not null)
-                    CurrentValue = (Tval)(object)FalseValue;
-                else
-                    CurrentValue = default;
-            }
+            //描画ループの原因
+            //if (IsCheck)
+            //{
+            //    if (TrueValue is not null)
+            //        CurrentValue = (Tval)(object)TrueValue;
+            //    else
+            //        CurrentValue = default;
+            //}
+            //else
+            //{
+            //    if (FalseValue is not null)
+            //        CurrentValue = (Tval)(object)FalseValue;
+            //    else
+            //        CurrentValue = default;
+            //}
             //indeterminateを結合
             var cssClass = string.Join(' ', CssClass, IsIndeterminate ? "is-indeterminate" : "");
 
@@ -103,7 +118,7 @@ namespace BlazorCustomInput.Components
             builder.AddAttribute(++index, "type", "checkbox");
             builder.AddAttribute(++index, "class", cssClass);
             builder.AddAttribute(++index, "value", BindConverter.FormatValue(CurrentValue));
-            builder.AddAttribute(++index, "checked", BindConverter.FormatValue(IsCheck));
+            //builder.AddAttribute(++index, "checked", BindConverter.FormatValue(IsCheck));
             builder.AddAttribute(++index, "onchange", EventCallback.Factory.CreateBinder<bool>(this, __value => IsCheck = __value, IsCheck));
             builder.AddElementReferenceCapture(++index, __inputReference => Element = __inputReference);
 
