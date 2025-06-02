@@ -1,0 +1,21 @@
+﻿@inherits EditBase<Tval>
+@typeparam Tval
+
+<select @onchange="OnChanged">
+    @if (ChoseTemplate != null && IsValueNull)
+    {
+        <option value="">@ChoseTemplate</option>
+    }
+
+    @foreach (var option in Options)
+    {
+        var selected = Compare(option.Value, Value);
+        <option value="@GetOptionKey(option.Value)" selected="@selected">
+            @option.ChildContent
+        </option>
+    }
+</select>
+
+<CascadingValue Value="this" IsFixed="true">
+    @ChildContent
+</CascadingValue>
