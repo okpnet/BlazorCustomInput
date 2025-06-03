@@ -1,60 +1,89 @@
 ﻿using BlazorCustomInput.Base;
 using Microsoft.AspNetCore.Components;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BlazorCustomInput.Components.Tests
 {
     public partial class EditorSelectTest<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Tval> : EditBase<Tval>
     {
-        private readonly List<EditorSelectOptionTest<Tval>> _options = new();
+        [Parameter] 
+        public RenderFragment? ChildContent { get; set; }
 
-        [Parameter] public Tval? Value { get; set; }
-        [Parameter] public EventCallback<Tval?> ValueChanged { get; set; }
+        [Parameter] 
+        public RenderFragment? ChoseTemplate { get; set; }
 
-        [Parameter] public RenderFragment? ChildContent { get; set; }
-        [Parameter] public RenderFragment? ChoseTemplate { get; set; }
+        [Parameter] 
+        public Func<Tval?, Tval?, bool>? CompareFunc { get; set; }
 
-        [Parameter] public Func<Tval?, Tval?, bool>? CompareFunc { get; set; }
-        [Parameter] public Func<Tval?, string>? OptionValueSelector { get; set; }
+        [Parameter] 
+        public Func<Tval?, string>? OptionValueSelector { get; set; }
 
-        internal void RegisterOption(EditorSelectOptionTest<Tval> option)
+        internal List<OptionEntry<Tval>> Options { get; } = new();
+
+        internal void RegisterOption(OptionTest<Tval> option)
         {
-            _options.Add(option);
+            var key = option.Value?.GetHashCode().ToString() ?? "null";
+            Options.Add(new OptionEntry<Tval>
+            {
+                Key = key,
+                Value = option.Value,
+                ChildContent = option.ChildContent,
+                IsPlaceholder = option.IsPlaceholder
+            });
         }
-
-        protected override void OnParametersSet()
-        {
-            _options.Clear(); // 再構築のため
-        }
-
-        protected List<EditorSelectOptionTest<Tval>> Options => _options;
 
         protected bool IsValueNull => EqualityComparer<Tval>.Default.Equals(Value, default);
 
         protected bool Compare(Tval? x, Tval? y)
             => CompareFunc?.Invoke(x, y) ?? EqualityComparer<Tval>.Default.Equals(x, y);
 
-        protected string GetOptionKey(Tval? value)
-            => OptionValueSelector?.Invoke(value) ?? value?.ToString() ?? "";
+        protected string? GetOptionKey(Tval? value)=> OptionValueSelector is not null? 
+            OptionValueSelector.Invoke(value) : 
+            (value is not null ? value.GetHashCode().ToString() : null);
 
-        protected async Task OnChanged(ChangeEventArgs e)
+        private async Task OnChange(ChangeEventArgs e)
         {
-            var newValueStr = e.Value?.ToString();
-            foreach (var option in _options)
+            var selectedKey = e.Value?.ToString();
+            var match = Options.FirstOrDefault(o => o.Key == selectedKey);
+            if (match is not null && !EqualityComparer<Tval?>.Default.Equals(Value, match.Value))
             {
-                if (GetOptionKey(option.Value) == newValueStr)
-                {
-                    Value = option.Value;
-                    await ValueChanged.InvokeAsync(Value);
-                    StateHasChanged();
-                    break;
-                }
+                Value = match.Value;
+                await ValueChanged.InvokeAsync(Value);
             }
+        }
+
+        private bool IsSelected(OptionEntry<Tval> entry)
+            => EqualityComparer<Tval?>.Default.Equals(Value, entry.Value);
+
+        /// <summary>
+        /// オーバーライド
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        protected override bool ConvetTo(string? value, out Tval? result)
+        {
+            var selectedOption = Options.FirstOrDefault(t => GetOptionKey(t.Value) == value);
+            result=selectedOption is not null && selectedOption.Value is not null ? selectedOption.Value : default!;
+            return true;
+        }
+
+        protected override string? FormatValueAsString(Tval? value) => GetOptionKey(value);
+
+        protected override bool TryParseValueFromString(string? value, [MaybeNullWhen(false)] out Tval result, [NotNullWhen(false)] out string? validationErrorMessage)
+        {
+            var resultVal = ConvetTo(value, out result);
+            validationErrorMessage = resultVal ? string.Empty : ParsingErrorMessage;
+            return resultVal;
+        }
+
+
+        internal class OptionEntry<TVal>
+        {
+            public string Key { get; set; } = "";
+            public TVal? Value { get; set; }
+            public RenderFragment? ChildContent { get; set; }
+            public bool IsPlaceholder { get; set; }
         }
     }
 

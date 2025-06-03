@@ -1,7 +1,7 @@
 ﻿@inherits EditBase<Tval>
 @typeparam Tval
 
-<select @onchange="OnChanged">
+<select onchange="OnChanged">
     @if (ChoseTemplate != null && IsValueNull)
     {
         <option value="">@ChoseTemplate</option>
