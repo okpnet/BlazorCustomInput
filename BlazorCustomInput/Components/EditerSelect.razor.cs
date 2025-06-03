@@ -1,21 +1,23 @@
 ﻿using BlazorCustomInput.Base;
+using BlazorCustomInput.Components.Tests;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Rendering;
 using System.Diagnostics.CodeAnalysis;
 
-namespace BlazorCustomInput.Components.Tests
+namespace BlazorCustomInput.Components
 {
-    public partial class EditorSelectTest<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Tval> : EditBase<Tval>
+    public class EditerSelect<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Tval> : EditBase<Tval>
     {
-        [Parameter] 
+        [Parameter]
         public RenderFragment? ChildContent { get; set; }
 
-        [Parameter] 
+        [Parameter]
         public RenderFragment? ChoseTemplate { get; set; }
 
-        [Parameter] 
+        [Parameter]
         public Func<Tval?, Tval?, bool>? CompareFunc { get; set; }
 
-        [Parameter] 
+        [Parameter]
         public Func<Tval?, string>? OptionValueSelector { get; set; }
 
         internal List<OptionEntry<Tval>> Options { get; } = new();
@@ -38,8 +40,8 @@ namespace BlazorCustomInput.Components.Tests
         protected bool Compare(Tval? x, Tval? y)
             => CompareFunc?.Invoke(x, y) ?? EqualityComparer<Tval>.Default.Equals(x, y);
 
-        protected string? GetOptionKey(Tval? value)=> OptionValueSelector is not null? 
-            OptionValueSelector.Invoke(value) : 
+        protected string? GetOptionKey(Tval? value) => OptionValueSelector is not null ?
+            OptionValueSelector.Invoke(value) :
             (value is not null ? value.GetHashCode().ToString() : null);
 
         private async Task OnChange(ChangeEventArgs e)
@@ -65,7 +67,7 @@ namespace BlazorCustomInput.Components.Tests
         protected override bool ConvetTo(string? value, out Tval? result)
         {
             var selectedOption = Options.FirstOrDefault(t => GetOptionKey(t.Value) == value);
-            result=selectedOption is not null && selectedOption.Value is not null ? selectedOption.Value : default!;
+            result = selectedOption is not null && selectedOption.Value is not null ? selectedOption.Value : default!;
             return true;
         }
 
@@ -78,6 +80,38 @@ namespace BlazorCustomInput.Components.Tests
             return resultVal;
         }
 
+        protected override void BuildRenderTree(RenderTreeBuilder builder)
+        {
+            builder.OpenElement(0, "select");
+            builder.AddMultipleAttributes(1, AdditionalAttributes);
+            builder.AddAttribute(2, "onchange", EventCallback.Factory.Create<ChangeEventArgs>(this,OnChange));
+            if (ChoseTemplate != null && IsValueNull)
+            {
+                builder.OpenElement(3, "option");
+                builder.AddAttribute(4, "value", "");
+                builder.AddContent(5, ChoseTemplate);
+
+                builder.CloseElement();
+            }
+            foreach(var option in Options)
+            {
+                var selected = Compare(option.Value, Value);
+                builder.OpenElement(6, "option");
+                builder.AddAttribute(7, "value", GetOptionKey(option.Value));
+                builder.SetUpdatesAttributeName("value");
+                builder.AddAttribute(8, "selected", selected);
+                builder.AddContent(9, option.ChildContent);
+                builder.CloseElement();
+            }
+            builder.AddElementReferenceCapture(10, __inputReference => Element = __inputReference);
+            builder.CloseElement();
+            builder.OpenComponent<CascadingValue<EditerSelect<Tval>>>(11);
+            builder.AddAttribute(12, "Value", this);
+            builder.AddAttribute(13, "IsFixed", true);
+            builder.AddContent(14, ChildContent);
+
+            builder.CloseComponent();
+        }
 
         internal class OptionEntry<TVal>
         {
@@ -87,5 +121,4 @@ namespace BlazorCustomInput.Components.Tests
             public bool IsPlaceholder { get; set; }
         }
     }
-
 }
