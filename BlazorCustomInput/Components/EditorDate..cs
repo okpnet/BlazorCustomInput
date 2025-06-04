@@ -10,7 +10,7 @@ namespace BlazorCustomInput.Components
     /// <summary>
     /// 日付フォームコンポーネント
     /// </summary>
-    public partial class EditerDate<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Tval> : EditBase<Tval>
+    public partial class EditorDate<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Tval> : EditBase<Tval>
     {
         #region"Const"
         private const string DateFormat = "yyyy-MM-dd";                     // Compatible with HTML 'date' inputs
@@ -74,7 +74,7 @@ namespace BlazorCustomInput.Components
         /// 型チェック｡GetStepAttrValがあれば評価いらない?
         /// </summary>
         /// <exception cref="InvalidOperationException"></exception>
-        public EditerDate()
+        public EditorDate()
         {
             var tvalType = Nullable.GetUnderlyingType(typeof(Tval)) ?? typeof(Tval);
             if (tvalType != typeof(DateTime) &&

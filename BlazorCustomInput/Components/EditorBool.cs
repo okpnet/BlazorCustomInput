@@ -10,7 +10,7 @@ namespace BlazorCustomInput.Components
     /// ブーリアンチェックボックスコンポーネント
     /// </summary>
     /// <typeparam name="Tval"></typeparam>
-    public partial class EditerBool<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Tval> : EditBase<Tval>
+    public partial class EditorBool<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Tval> : EditBase<Tval>
     {
         #region"Protected Field"
         /// <summary>
@@ -50,7 +50,7 @@ namespace BlazorCustomInput.Components
         /// <summary>
         /// コンストラクタ
         /// </summary>
-        public EditerBool()
+        public EditorBool()
         {
             var tvalType = Nullable.GetUnderlyingType(typeof(Tval)) ?? typeof(Tval);
             if (tvalType != typeof(short) &&

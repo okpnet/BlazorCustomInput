@@ -9,8 +9,13 @@ namespace BlazorCustomInput.Components
     /// <summary>
     /// テキストフォームコンポーネント
     /// </summary>
-    public partial class EditerTextArea<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Tval> : EditBase<Tval>
+    public partial class EditorText<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Tval> : EditBase<Tval>
     {
+        /// <summary>
+        /// エディットタイプ
+        /// </summary>
+        [Parameter]
+        public TextEditType EditType { get; set; } = TextEditType.Text;
         /// <summary>
         /// 入力中の即時更新をOnにする
         /// 入力中にEditContext?.NotifyFieldChangedが呼ばれるので注意。
@@ -22,7 +27,7 @@ namespace BlazorCustomInput.Components
         /// 型チェック｡GetStepAttrValがあれば評価いらない?
         /// </summary>
         /// <exception cref="InvalidOperationException"></exception>
-        public EditerTextArea()
+        public EditorText() : base()
         {
             var tvalType = Nullable.GetUnderlyingType(typeof(Tval)) ?? typeof(Tval);
             if (tvalType != typeof(string))
@@ -31,18 +36,24 @@ namespace BlazorCustomInput.Components
             }
         }
 
+        protected override async Task OnAfterRenderAsync(bool firstRender)
+        {
+            await base.OnAfterRenderAsync(firstRender);
+            if (firstRender && AutoFocus) await FocusAsync();
+        }
         /// <inheritdoc />
         protected override void BuildRenderTree(RenderTreeBuilder builder)
         {
             var index = 0;
-            builder.OpenElement(index, "textarea");
+            var editType = EditType.GetTypeString();
+            builder.OpenElement(index, "input");
             index+=1;
             builder.AddAttribute(index, "disabled", IsDisabled);
             builder.AddMultipleAttributes(++index, AdditionalAttributes);
+            builder.AddAttribute(++index, "type", editType);
             builder.AddAttribute(++index, "class", CssClass);
             builder.AddAttribute(++index, "value", BindConverter.FormatValue(CurrentValueAsString));
             builder.AddAttribute(++index, "onchange", EventCallback.Factory.CreateBinder<string?>(this, __value => CurrentValueAsString = __value, CurrentValueAsString));
-
             index += 1;
             if (IsImmediateUpdate)
             {
@@ -62,7 +73,7 @@ namespace BlazorCustomInput.Components
                         Value)
                 );
             }
-
+            
             builder.AddElementReferenceCapture(++index, __inputReference => Element = __inputReference);
 
             builder.CloseElement();
@@ -82,6 +93,18 @@ namespace BlazorCustomInput.Components
             }
             else
             {
+                var regex = EditType switch
+                {
+                    TextEditType.Email => "^[\\w\\-\\._]+@[\\w\\-\\._]+\\.[A-Za-z]+",
+                    TextEditType.Url => "https?://[\\w!\\?/\\+\\-_~=;\\.,\\*&@#\\$%\\(\\)'\\[\\]]+",
+                    TextEditType.Number => "^[\\d]+",
+                    _ => ""
+                };
+                if (regex is not (null or "") && !System.Text.RegularExpressions.Regex.IsMatch(value, regex))
+                {
+                    result = default;
+                    return false;
+                }
                 result = (Tval)(object)value;
                 return true;
             }

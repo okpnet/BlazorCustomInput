@@ -1,18 +1,14 @@
 ﻿using BlazorCustomInput.Base;
-using BlazorCustomInput.Components.Tests;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using System.Diagnostics.CodeAnalysis;
 
 namespace BlazorCustomInput.Components
 {
-    public class EditerSelect<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Tval> : EditBase<Tval>
+    public class EditorSelect<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Tval> : EditBase<Tval>
     {
         [Parameter]
         public RenderFragment? ChildContent { get; set; }
-
-        [Parameter]
-        public RenderFragment? ChoseTemplate { get; set; }
 
         [Parameter]
         public Func<Tval?, Tval?, bool>? CompareFunc { get; set; }
@@ -22,7 +18,7 @@ namespace BlazorCustomInput.Components
 
         internal List<OptionEntry<Tval>> Options { get; } = new();
 
-        internal void RegisterOption(OptionTest<Tval> option)
+        internal void RegisterOption(EditorSelectOption<Tval> option)
         {
             var key = option.Value?.GetHashCode().ToString() ?? "null";
             Options.Add(new OptionEntry<Tval>
@@ -84,32 +80,27 @@ namespace BlazorCustomInput.Components
         {
             builder.OpenElement(0, "select");
             builder.AddMultipleAttributes(1, AdditionalAttributes);
+            builder.AddAttribute(1, "value", GetOptionKey(Value)); // ← これが重要！
             builder.AddAttribute(2, "onchange", EventCallback.Factory.Create<ChangeEventArgs>(this,OnChange));
-            if (ChoseTemplate != null && IsValueNull)
-            {
-                builder.OpenElement(3, "option");
-                builder.AddAttribute(4, "value", "");
-                builder.AddContent(5, ChoseTemplate);
+            builder.SetUpdatesAttributeName("value");
+            
+            builder.OpenComponent<OptionBuilder>(7);//シーケンスを使わずにコンポーネント化。再描画に寄与
+            builder.AddAttribute(8, nameof(OptionBuilder.RenderOptions), Options);
+            builder.AddAttribute(9, nameof(OptionBuilder.CompareFunc), CompareFunc);
+            builder.AddAttribute(10, nameof(OptionBuilder.Value), Value);
+            builder.AddAttribute(11, nameof(OptionBuilder.OptionValueSelector), OptionValueSelector);
+            builder.CloseComponent();
 
-                builder.CloseElement();
-            }
-            foreach(var option in Options)
-            {
-                var selected = Compare(option.Value, Value);
-                builder.OpenElement(6, "option");
-                builder.AddAttribute(7, "value", GetOptionKey(option.Value));
-                builder.SetUpdatesAttributeName("value");
-                builder.AddAttribute(8, "selected", selected);
-                builder.AddContent(9, option.ChildContent);
-                builder.CloseElement();
-            }
-            builder.AddElementReferenceCapture(10, __inputReference => Element = __inputReference);
+            builder.AddElementReferenceCapture(12, __inputReference => Element = __inputReference);
             builder.CloseElement();
-            builder.OpenComponent<CascadingValue<EditerSelect<Tval>>>(11);
-            builder.AddAttribute(12, "Value", this);
-            builder.AddAttribute(13, "IsFixed", true);
-            builder.AddContent(14, ChildContent);
 
+            builder.OpenComponent<CascadingValue<EditorSelect<Tval>>>(13);
+            builder.AddAttribute(14, "Value", this);
+            builder.AddAttribute(15, "IsFixed", true);
+            builder.AddAttribute(16, "ChildContent", (RenderFragment)(childBuilder =>
+            {
+                childBuilder.AddContent(17, ChildContent);
+            }));
             builder.CloseComponent();
         }
 
@@ -119,6 +110,49 @@ namespace BlazorCustomInput.Components
             public TVal? Value { get; set; }
             public RenderFragment? ChildContent { get; set; }
             public bool IsPlaceholder { get; set; }
+        }
+
+        internal class OptionBuilder:ComponentBase
+        {
+            [Parameter]
+            public IEnumerable<OptionEntry<Tval>> RenderOptions { get; set; }
+
+            [Parameter]
+            public Func<Tval?, Tval?, bool>? CompareFunc { get; set; }
+
+            [Parameter]
+            public Tval? Value { get; set; }
+
+            [Parameter]
+            public Func<Tval?, string>? OptionValueSelector { get; set; }
+
+            protected override void BuildRenderTree(RenderTreeBuilder builder)
+            {
+                var seq = 0;
+                foreach (var option in RenderOptions)
+                {
+                    var selected = Compare(option.Value, Value);
+                    builder.OpenElement(seq++, "option");
+                    builder.AddAttribute(3, "value", GetOptionKey(option.Value));
+                    seq++;
+                    if(option.Value is null)
+                    {
+                        builder.AddAttribute(seq, "disabled", "disabled");
+                    }
+                    if (selected)
+                    {
+                        builder.AddAttribute(seq++, "selected", "selected");
+                    }
+                    builder.AddContent(seq++, option.ChildContent);
+                    builder.CloseElement();
+                }
+            }
+            protected bool Compare(Tval? x, Tval? y)
+            => CompareFunc?.Invoke(x, y) ?? EqualityComparer<Tval>.Default.Equals(x, y);
+
+            protected string? GetOptionKey(Tval? value) => OptionValueSelector is not null ?
+                OptionValueSelector.Invoke(value) :
+                (value is not null ? value.GetHashCode().ToString() : null);
         }
     }
 }

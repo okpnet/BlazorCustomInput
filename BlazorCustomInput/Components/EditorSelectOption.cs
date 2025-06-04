@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace BlazorCustomInput.Components
 {
-    public class EditerSelectOption<Tval>:ComponentBase
+    public class EditorSelectOption<Tval>:ComponentBase
     {
         [CascadingParameter]
-        public EditorSelectTest<Tval>? Parent { get; set; }
+        public EditorSelect<Tval>? Parent { get; set; }
 
         [Parameter]
         public Tval? Value { get; set; }

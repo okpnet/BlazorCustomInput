@@ -26,7 +26,7 @@ else if (autocomplete is not null)
     @AutocompleteFrame(autocomplete)
 }
     */
-    public partial class EditerAutocomplete<TVal> : EditerText<TVal>
+    public partial class EditorAutocomplete<TVal> : EditorText<TVal>
     {
         /// <summary>
         /// 

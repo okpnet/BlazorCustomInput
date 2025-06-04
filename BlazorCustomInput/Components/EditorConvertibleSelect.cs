@@ -13,7 +13,7 @@ namespace BlazorCustomInput.Components
     /// </summary>
     /// <typeparam name="Tval"></typeparam>
     /// <typeparam name="TSource"></typeparam>
-    public class EditerConvertibleSelect<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Tval, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] TSource> : EditBase<Tval>
+    public class EditorConvertibleSelect<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Tval, [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] TSource> : EditBase<Tval>
     {
         private readonly bool _isMultipleSelect;
         private IEnumerable<TSource> _source;
@@ -42,7 +42,7 @@ namespace BlazorCustomInput.Components
         [Parameter, EditorRequired]
         public Func<TSource?, string> OptionContents { get; set; } = default!;
 
-        public EditerConvertibleSelect()
+        public EditorConvertibleSelect()
         {
             _isMultipleSelect = typeof(TSource).IsArray;
             _source=Enumerable.Empty<TSource>();

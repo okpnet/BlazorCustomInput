@@ -9,7 +9,7 @@ namespace BlazorCustomInput.Components
     /// <summary>
     /// タイムスパンコンポーネント
     /// </summary>
-    public partial class EditerTimeSpan<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Tval> : EditBase<Tval>
+    public partial class EditorTimeSpan<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Tval> : EditBase<Tval>
     {//入力済みのものがあるとき、単位を上位に変更すると下位が切り捨てられる。
         /// <summary>
         /// InputNumber引用

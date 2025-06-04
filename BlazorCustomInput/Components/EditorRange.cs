@@ -9,7 +9,7 @@ namespace BlazorCustomInput.Components
     /// <summary>
     /// 数コンポーネント
     /// </summary>
-    public partial class EditerRange<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Tval> : EditBase<Tval>
+    public partial class EditorRange<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Tval> : EditBase<Tval>
     {
 
         /// <summary>

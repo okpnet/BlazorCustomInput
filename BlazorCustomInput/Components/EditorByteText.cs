@@ -8,7 +8,7 @@ namespace BlazorCustomInput.Components
     /// <summary>
     /// GUID､バイト配列テキストコンポーネント
     /// </summary>
-    public partial class EditerByteText<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Tval> : EditBase<Tval>
+    public partial class EditorByteText<[DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.All)] Tval> : EditBase<Tval>
     {
         /// <summary>
         /// カスタムフォーマット
@@ -16,7 +16,7 @@ namespace BlazorCustomInput.Components
         [Parameter]
         public string CustomGuidFormat { get; set; } = "D";
 
-        public EditerByteText()
+        public EditorByteText()
         {
             var tvalType = Nullable.GetUnderlyingType(typeof(Tval)) ?? typeof(Tval);
             if (tvalType != typeof(byte[]) &&
