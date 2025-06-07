@@ -17,9 +17,13 @@
 		<Title>BlazorCustomInput</Title>
 	</PropertyGroup>
     <ItemGroup>
+      <Compile Remove="Components\Internal\**" />
       <Compile Remove="LinqExt\**" />
+      <Content Remove="Components\Internal\**" />
       <Content Remove="LinqExt\**" />
+      <EmbeddedResource Remove="Components\Internal\**" />
       <EmbeddedResource Remove="LinqExt\**" />
+      <None Remove="Components\Internal\**" />
       <None Remove="LinqExt\**" />
     </ItemGroup>
 
@@ -29,10 +33,6 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.6" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Components\Internal\" />
   </ItemGroup>
 
 </Project>
